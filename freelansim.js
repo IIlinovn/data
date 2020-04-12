@@ -50,7 +50,19 @@ async function getData() {
 
         }
 
-        result.push({ title, price_value, price_type, price_valuta, desc, tags })
+        let date_in
+        let response
+        let view
+
+        const marks = document.querySelector(".task__meta").innerText.split('•');
+        date_in = marks[0];
+        response = marks[1];
+        view = marks[2]
+        
+
+        }
+
+        result.push({ title, price_value, price_type, price_valuta, desc, date_in, response, view, tags })
     }
 
     return result;
