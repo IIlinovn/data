@@ -15,7 +15,7 @@ async function getItem(url) {
     return {
         title: document.querySelector(".task__title").textContent,
         desc: document.querySelector(".task__description").textContent,
-        tags: tags.join(', ')
+        tags: tags
     }
 }
 
