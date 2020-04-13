@@ -4,7 +4,7 @@ const { JSDOM } = jsdom;
 
 async function getItem(url) {
     const document = (await JSDOM.fromURL(url)).window.document;
-    
+
     const tags = []
 
     const tagsHTML = await document.querySelectorAll(".tags__item_link");
@@ -13,18 +13,19 @@ async function getItem(url) {
         tags.push(tagsHTML[i].innerHTML)
 
     return {
-        id: task_id = url.split('/').pop(),
+        id: task_id = Number(url.split('/').pop()),
         title: document.querySelector(".task__title").textContent,
         desc: document.querySelector(".task__description").textContent.trim().replace("\n", " ").replace(" \n", " ").replace("\n\n", " "),
         tags: tags,
         date_in: document.querySelector(".task__meta").textContent.split('•')[0].trim(),
-        response: document.querySelector(".task__meta").textContent.split('•')[1].trim().replace("\n", "").replace("\nотклик", "отклик").replace("\nотклика", "отклика").replace("\nоткликов", "откликов"),
-        view: document.querySelector(".task__meta").textContent.split('•')[2].trim().replace("\n", "").replace("\nпросмотр", "просмотр").replace("\nпросмотра", "просмотра").replace("\nпросмотров", "просмотров"),
+        response: Number(document.querySelector(".task__meta").textContent.split('•')[1].trim().split('\n').shift()),
+        view: Number(document.querySelector(".task__meta").textContent.split('•')[2].trim().split('\n').shift()),
         user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
         user: document.querySelector(".fullname a").textContent,
-        finished: document.querySelector(".user_statistics").childNodes[5].textContent.trim().replace("\n", " "),
-        in_work: document.querySelector(".user_statistics").childNodes[7].textContent.trim().replace("\n", " ").replace(" \n", " "),
-        feedbacks: document.querySelector(".user_statistics").childNodes[11].textContent.trim().replace("\n", " "),
+        finished: Number(document.querySelector(".user_statistics").childNodes[5].textContent.trim().split('\n').pop()),
+        in_work: Number(document.querySelector(".user_statistics").childNodes[7].textContent.trim().split('\n').pop()),
+        feedback_plus: Number(document.querySelector(".user_statistics").childNodes[11].textContent.trim().split('\n').pop().split(" / ").shift()),
+        feedback_minus: Number(document.querySelector(".user_statistics").childNodes[11].textContent.trim().split('\n').pop().split(" / ").pop())
     }
 }
 
@@ -43,7 +44,7 @@ async function getCountPage() {
 
 async function getData(numPage = 1) {
 
-    let result = [] //Он сейчас undefined))
+    let result = []
     
     const html = await JSDOM.fromURL("https://freelance.habr.com/tasks?page=" + numPage)
 
@@ -67,7 +68,7 @@ async function getData(numPage = 1) {
             if (safeHTML) { 
                 safe = safeHTML.title }
 
-            const { id, desc, tags, date_in, response, view, user_id, user, finished, in_work, feedbacks } = await getItem(link);
+            const { id, desc, tags, date_in, response, view, user_id, user, finished, in_work, feedback_plus, feedback_minus } = await getItem(link);
 
             let price_value
             let price_type
@@ -81,7 +82,7 @@ async function getData(numPage = 1) {
                 price_type = prices[1].replace("проект</span>", "проект").replace("час</span>", "час")
             }
 
-            result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, finished, in_work, feedbacks })
+            result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, finished, in_work, feedback_plus, feedback_minus })
         
         }
 
