@@ -28,50 +28,69 @@ async function getItem(url) {
     }
 }
 
-async function getData() {
-
-    let result = []
+async function getPage() {
 
     const html = await JSDOM.fromURL("https://freelance.habr.com/tasks")
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const tasksHTML = html.window.document.querySelectorAll(".task");
+    const pages_max = html.window.document.querySelector('.pagination').childNodes[14].textContent
+    
+    return { num: Number.pages_max + 1 }
+}
 
-    for (let i = 0; i < tasksHTML.length; i++) {
-        const taskHTML = tasksHTML[i].innerHTML;
-        const task = new JSDOM(taskHTML).window.document
-        const title = task.querySelector(".task__title a").innerHTML;
-        const link = 'https://freelance.habr.com/' + task.querySelector(".task__title a").attributes.href.value;
+
+
+async function getData() {
+
+    let result = [] Он сейчас undefined))
+    
+    const html = await JSDOM.fromURL("https://freelance.habr.com/tasks")
+
+    fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
+
+    const { num } = await getPage();
+    
+    for (let i = 1; i < num; i++) {
+
+        const tasksHTML = html.window.document.querySelectorAll(".task");
+
+        for (let i = 0; i < tasksHTML.length; i++) {
+            const taskHTML = tasksHTML[i].innerHTML;
+            const task = new JSDOM(taskHTML).window.document
+            const title = task.querySelector(".task__title a").innerHTML;
+            const link = 'https://freelance.habr.com/tasks?page='+ i + task.querySelector(".task__title a").attributes.href.value;
         
-        let urgent
-        const urgentHTML = task.querySelector(".task__urgent");
-        if (urgentHTML) { 
-            urgent = urgentHTML.textContent }
+            let urgent
+            const urgentHTML = task.querySelector(".task__urgent");
+            if (urgentHTML) { 
+                urgent = urgentHTML.textContent }
         
-        let safe
-        const safeHTML = task.querySelector(".safe-deal-icon");
-        if (safeHTML) { 
-            safe = safeHTML.title }
+            let safe
+            const safeHTML = task.querySelector(".safe-deal-icon");
+            if (safeHTML) { 
+                safe = safeHTML.title }
 
-        const { id, desc, tags, date_in, response, view, user_id, user, finished, in_work, feedbacks } = await getItem(link);
+            const { id, desc, tags, date_in, response, view, user_id, user, finished, in_work, feedbacks } = await getItem(link);
 
-        let price_value
-        let price_type
-        let price_valuta
+            let price_value
+            let price_type
+            let price_valuta
 
-        const priceHTML = task.querySelector(".count");
-        if (priceHTML) {
-            const prices = priceHTML.innerHTML.split(/ <span class="suffix">/);
-            price_value = Number.parseInt(prices[0].replace(' ', ''))
-            price_valuta = prices[0].split(" ").pop();
-            price_type = prices[1].replace("проект</span>", "проект").replace("час</span>", "час")
+            const priceHTML = task.querySelector(".count");
+            if (priceHTML) {
+                const prices = priceHTML.innerHTML.split(/ <span class="suffix">/);
+                price_value = Number.parseInt(prices[0].replace(' ', ''))
+                price_valuta = prices[0].split(" ").pop();
+                price_type = prices[1].replace("проект</span>", "проект").replace("час</span>", "час")
+            }
+
+            result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, finished, in_work, feedbacks })
+        
         }
 
-        result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, finished, in_work, feedbacks })
+        return result;
     }
-
-    return result;
 }
 
 module.exports = getData
