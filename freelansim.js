@@ -15,15 +15,16 @@ async function getItem(url) {
     return {
         id: task_id = url.split('/').pop(),
         title: document.querySelector(".task__title").textContent,
-        desc: document.querySelector(".task__description").textContent.trim().replace("\n", " "),
+        desc: document.querySelector(".task__description").textContent.trim().replace("\n", " ").replace(" \n", " ").replace("\n\n", " "),
         tags: tags,
         date_in: document.querySelector(".task__meta").textContent.split('•')[0].trim(),
         response: document.querySelector(".task__meta").textContent.split('•')[1].trim().replace("\n", "").replace("\nотклик", "отклик").replace("\nотклика", "отклика").replace("\nоткликов", "откликов"),
         view: document.querySelector(".task__meta").textContent.split('•')[2].trim().replace("\n", "").replace("\nпросмотр", "просмотр").replace("\nпросмотра", "просмотра").replace("\nпросмотров", "просмотров"),
         user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
         user: document.querySelector(".fullname a").textContent,
+        finished: document.querySelector(".user_statistics").childNodes[5].textContent.trim().replace("\n", " "),
+        in_work: document.querySelector(".user_statistics").childNodes[7].textContent.trim().replace("\n", " ").replace(" \n", " "),
         feedbacks: document.querySelector(".user_statistics").childNodes[11].textContent.trim().replace("\n", " "),
-        
     }
 }
 
@@ -47,8 +48,13 @@ async function getData() {
         const urgentHTML = task.querySelector(".task__urgent");
         if (urgentHTML) { 
             urgent = urgentHTML.textContent }
+        
+        let safe
+        const safeHTML = task.querySelector(".safe-deal-icon");
+        if (safeHTML) { 
+            safe = safeHTML.title }
 
-        const { id, desc, tags, date_in, response, view, user_id, user, feedbacks } = await getItem(link);
+        const { id, desc, tags, date_in, response, view, user_id, user, finished, in_work, feedbacks } = await getItem(link);
 
         let price_value
         let price_type
@@ -62,7 +68,7 @@ async function getData() {
             price_type = prices[1].replace("проект</span>", "проект").replace("час</span>", "час")
         }
 
-        result.push({ id, title, urgent, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, feedbacks })
+        result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, finished, in_work, feedbacks })
     }
 
     return result;
