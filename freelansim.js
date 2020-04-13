@@ -28,7 +28,7 @@ async function getItem(url) {
     }
 }
 
-async function getPage() {
+async function getCountPage() {
 
     const html = await JSDOM.fromURL("https://freelance.habr.com/tasks")
 
@@ -36,30 +36,26 @@ async function getPage() {
 
     const pages_max = html.window.document.querySelector('.pagination').childNodes[14].textContent
     
-    return { num: Number.pages_max + 1 }
+    return Number(pages_max);
 }
 
 
 
-async function getData() {
+async function getData(numPage = 1) {
 
-    let result = [] Он сейчас undefined))
+    let result = [] //Он сейчас undefined))
     
-    const html = await JSDOM.fromURL("https://freelance.habr.com/tasks")
+    const html = await JSDOM.fromURL("https://freelance.habr.com/tasks?page=" + numPage)
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const { num } = await getPage();
-    
-    for (let i = 1; i < num; i++) {
-
-        const tasksHTML = html.window.document.querySelectorAll(".task");
+    const tasksHTML = html.window.document.querySelectorAll(".task");
 
         for (let i = 0; i < tasksHTML.length; i++) {
             const taskHTML = tasksHTML[i].innerHTML;
             const task = new JSDOM(taskHTML).window.document
             const title = task.querySelector(".task__title a").innerHTML;
-            const link = 'https://freelance.habr.com/tasks?page='+ i + task.querySelector(".task__title a").attributes.href.value;
+            const link = 'https://freelance.habr.com' + task.querySelector(".task__title a").attributes.href.value;
         
             let urgent
             const urgentHTML = task.querySelector(".task__urgent");
@@ -89,8 +85,22 @@ async function getData() {
         
         }
 
-        return result;
-    }
+    return result;
 }
 
-module.exports = getData
+async function main(flag = false, callback) {
+    console.log('Start')
+    if (flag) {
+        const countPage = await getCountPage();
+        for(let i=0; i<countPage; i++) {
+            console.log('page #' + (i + 1))
+            const result = (await getData(i+1).catch(e => []));
+            callback(result)
+        }
+    } else {
+        callback(await getData());
+    }
+    console.log('Done')
+}
+
+module.exports = main
