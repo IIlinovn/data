@@ -4,7 +4,7 @@ const { JSDOM } = jsdom;
 
 async function getItem(url) {
     const document = (await JSDOM.fromURL(url)).window.document;
-
+    
     const tags = []
 
     const tagsHTML = await document.querySelectorAll(".tags__item_link");
@@ -13,9 +13,17 @@ async function getItem(url) {
         tags.push(tagsHTML[i].innerHTML)
 
     return {
+        id: task_id = url.split('/').pop(),
         title: document.querySelector(".task__title").textContent,
-        desc: document.querySelector(".task__description").textContent,
-        tags: tags
+        desc: document.querySelector(".task__description").textContent.replace('\n', ''),
+        tags: tags,
+        date_in: document.querySelector(".task__meta").textContent.replace('\n', '').split('•')[0],
+        response: document.querySelector(".task__meta").textContent.replace('\n', '').split('•')[1],
+        view: document.querySelector(".task__meta").textContent.replace('\n', '').split('•')[2],
+        user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
+        user: document.querySelector(".fullname a").textContent,
+        feedbacks: document.querySelector(".user_statistics").childNodes[11].textContent.replace('\n', ''),
+        
     }
 }
 
@@ -33,9 +41,9 @@ async function getData() {
         const taskHTML = tasksHTML[i].innerHTML;
         const task = new JSDOM(taskHTML).window.document
         const title = task.querySelector(".task__title a").innerHTML;
-        const link = 'https://freelance.habr.com/' + task.querySelector(".task__title a").attributes.href.value
+        const link = 'https://freelance.habr.com/' + task.querySelector(".task__title a").attributes.href.value;
 
-        const { desc, tags } = await getItem(link)
+        const { id, desc, tags, date_in, response, view, user_id, user, feedbacks } = await getItem(link);
 
         let price_value
         let price_type
@@ -50,19 +58,7 @@ async function getData() {
 
         }
 
-        let date_in
-        let response
-        let view
-
-        const marks = document.querySelector(".task__meta").innerText.split('•');
-        date_in = marks[0];
-        response = marks[1];
-        view = marks[2]
-        
-
-        }
-
-        result.push({ title, price_value, price_type, price_valuta, desc, date_in, response, view, tags })
+        result.push({ title, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, feedbacks })
     }
 
     return result;
