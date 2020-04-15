@@ -10,7 +10,7 @@ async function getItem(url) {
         desc: document.querySelector("p").textContent.replace("↵", " ").replace("\n", " "),
         view: Number(document.querySelector(".page_header_content .dot_divided").lastElementChild.textContent.split(' ').shift()),
         user: document.querySelector(".name").textContent,
-        //date_in: document.querySelector(".time_ago").attributes.data-original-title.value.replace(" в", ","),
+        date_in: document.querySelector(".time_ago").attributes.data-original-title.value.replace(" в", ","),
     }
 }
 
@@ -44,7 +44,7 @@ async function getData(numPage = 1) {
             const category = task.querySelector(".dot_divided span a").innerHTML;
             const link = 'https://www.weblancer.net/' + task.querySelector(".col-sm-10 .title a").attributes.href.value;
             
-            const { id, desc, user, view } = await getItem(link);
+            const { id, desc, date_in, user, view } = await getItem(link);
 
             const anons = task.querySelector(".col-sm-10 p").textContent;
 
@@ -71,7 +71,7 @@ async function getData(numPage = 1) {
                 price_valuta = prices.splice(0, 1);
             }
 
-            result.push({ id, title, category, anons, success, price_value, price_valuta, desc, user, view, response })
+            result.push({ id, title, category, anons, date_in, success, price_value, price_valuta, desc, user, view, response })
         
         }
 
