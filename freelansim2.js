@@ -14,17 +14,13 @@ async function getItem(url) {
 
     return {
         id: task_id = url.split('/').pop(),
-        title: document.querySelector(".task__title").textContent,
         desc: document.querySelector(".task__description").textContent.trim().replace("\n", " ").replace(" \n", " ").replace("\n\n", " "),
-        tags: tags,
+        price_value = Number.parseInt(document.querySelector('.b-layout__txt .b-layout__bold').textContent.trim().split(" ").shift()),
+        price_valuta = document.querySelector('.b-layout__txt .b-layout__bold').textContent.trim().split(" ").pop(),
         date_in: document.querySelector(".task__meta").textContent.split('•')[0].trim(),
-        response: document.querySelector(".task__meta").textContent.split('•')[1].trim().replace("\n", "").replace("\nотклик", "отклик").replace("\nотклика", "отклика").replace("\nоткликов", "откликов"),
-        view: document.querySelector(".task__meta").textContent.split('•')[2].trim().replace("\n", "").replace("\nпросмотр", "просмотр").replace("\nпросмотра", "просмотра").replace("\nпросмотров", "просмотров"),
+        
         user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
-        user: document.querySelector(".fullname a").textContent,
-        finished: document.querySelector(".user_statistics").childNodes[5].textContent.trim().replace("\n", " "),
-        in_work: document.querySelector(".user_statistics").childNodes[7].textContent.trim().replace("\n", " ").replace(" \n", " "),
-        feedbacks: document.querySelector(".user_statistics").childNodes[11].textContent.trim().replace("\n", " "),
+        user: document.querySelector(".fullname a").textContent
     }
 }
 
@@ -34,7 +30,11 @@ async function getCountPage() {
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const pages_max = html.window.document.querySelector('.pagination').childNodes[14].textContent
+    ('.b-pager__back-next')
+
+    body.querySelectorAll('#projects-list').length
+
+    const pages_max = html.window.document.querySelectorAll('#projects-list').length
     
     return Number(pages_max);
 }
@@ -43,45 +43,35 @@ async function getCountPage() {
 
 async function getData(numPage = 1) {
 
-    let result = [] //Он сейчас undefined))
+    let result = []
     
     const html = await JSDOM.fromURL("https://www.fl.ru/projects/?page=" + numPage)
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const tasksHTML = html.window.document.querySelectorAll("projects-list");
+    const tasksHTML = html.window.document.querySelectorAll(".b-post");
 
         for (let i = 0; i < tasksHTML.length; i++) {
             const taskHTML = tasksHTML[i].innerHTML;
             const task = new JSDOM(taskHTML).window.document
-            const title = task.querySelector(".task__title a").innerHTML;
-            const link = 'https://fl.ru' + task.querySelector(".task__title a").attributes.href.value;
+            const title = task.querySelector(".b-post__title  a").innerHTML;
+            const category = task.querySelector(".b-post__foot span.b-post__bold").innerHTML;
+            const link = 'https://www.weblancer.net/' + task.querySelector(".b-post__title  a").attributes.href.value;
         
-            let urgent
-            const urgentHTML = task.querySelector(".task__urgent");
-            if (urgentHTML) { 
-                urgent = urgentHTML.textContent }
-        
+            let anons = task.querySelector("b-post__body .b-post__txt").textContent
+
             let safe
-            const safeHTML = task.querySelector(".safe-deal-icon");
+            const safeHTML = task.querySelector(".b-post__price a");
             if (safeHTML) { 
-                safe = safeHTML.title }
+                safe = safeHTML.textContent }
+            
+            let response = Number(task.querySelector('.b-post__foot a').textContent.split(" ").shift())
 
-            const { id, desc, tags, date_in, response, view, user_id, user, finished, in_work, feedbacks } = await getItem(link);
+            let view = Number(task.querySelector('.b-post__foot span.b-post__txt').textContent.trim())
 
-            let price_value
-            let price_type
-            let price_valuta
+            const { id, desc, price_value, price_valuta, date_in, response, view, user_id, user, finished, in_work, feedbacks } = await getItem(link);
 
-            const priceHTML = task.querySelector(".count");
-            if (priceHTML) {
-                const prices = priceHTML.innerHTML.split(/ <span class="suffix">/);
-                price_value = Number.parseInt(prices[0].replace(' ', ''))
-                price_valuta = prices[0].split(" ").pop();
-                price_type = prices[1].replace("проект</span>", "проект").replace("час</span>", "час")
-            }
-
-            result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, finished, in_work, feedbacks })
+            result.push({ id, title, category, safe, price_value, price_valuta, anons, desc, date_in, response, view, user_id, user })
         
         }
 
