@@ -4,13 +4,11 @@ const { JSDOM } = jsdom;
 
 async function getItem(url) {
     const document = (await JSDOM.fromURL(url)).window.document;
-
-    let view = document.querySelectorAll(".page_header_content .dot_divided span")[document.querySelectorAll(".page_header_content .dot_divided span").length-1].textContent
-
+    console.log(document.querySelector(".time_ago").attributes.data-original-title.value)
     return {
         id: task_id = Number(url.split('/').pop().split('-').pop()),
         desc: document.querySelector("p").textContent.replace("↵", " ").replace("\n", " "),
-        view: Number.parseInt(view.split(' ').shift()),
+        view: Number(document.querySelector(".page_header_content .dot_divided").lastElementChild.textContent.split(' ').shift()),
         user: document.querySelector(".name").textContent,
         //date_in: document.querySelector(".time_ago").attributes.data-original-title.value.replace(" в", ","),
     }
@@ -22,7 +20,7 @@ async function getCountPage() {
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const pages_max = html.window.document.querySelector('.pagination').childNodes[14].textContent
+    const pages_max = html.window.document.querySelector('.pagination_box .no-gutters .text-right a').attributes.href.value
     
     return Number(pages_max);
 }
@@ -33,7 +31,7 @@ async function getData(numPage = 1) {
 
     let result = []
     
-    const html = await JSDOM.fromURL("https://www.weblancer.net/jobs/?page=" + numPage)
+    const html = await JSDOM.fromURL("https://www.fl.ru/projects/?page=" + numPage)
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
@@ -44,9 +42,9 @@ async function getData(numPage = 1) {
             const task = new JSDOM(taskHTML).window.document
             const title = task.querySelector(".col-sm-10 .title a").innerHTML;
             const category = task.querySelector(".dot_divided span a").innerHTML;
-            const link = 'https://www.weblancer.net' + task.querySelector(".col-sm-10 .title a").attributes.href.value;
+            const link = 'https://www.fl.ru' + task.querySelector(".col-sm-10 .title a").attributes.href.value;
             
-            const { id, desc, view, user } = await getItem(link);
+            const { id, desc, user, view } = await getItem(link);
 
             const anons = task.querySelector(".col-sm-10 p").textContent;
 
@@ -73,7 +71,7 @@ async function getData(numPage = 1) {
                 price_valuta = prices.splice(0, 1);
             }
 
-            result.push({ id, title, category, anons, success, price_value, price_valuta, desc, response, view, user })
+            result.push({ id, title, category, anons, success, price_value, price_valuta, desc, user, view, response })
         
         }
 
