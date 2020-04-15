@@ -21,7 +21,7 @@ async function getCountPage() {
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
     const pages_max = html.window.document.querySelector('.pagination_box .no-gutters .text-right a').attributes.href.value
-    
+    console.log(Number(pages_max))
     return Number(pages_max);
 }
 
@@ -35,7 +35,7 @@ async function getData(numPage = 1) {
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const tasksHTML = html.window.document.querySelector(".click_container-link");
+    const tasksHTML = html.window.document.querySelectorAll(".click_container-link");
 
         for (let i = 0; i < tasksHTML.length; i++) {
             const taskHTML = tasksHTML[i].innerHTML;
@@ -54,7 +54,6 @@ async function getData(numPage = 1) {
                 success = successHTML.textContent }
         
             let response 
-            
             const responseHTML = task.querySelector(".col-sm-2 .text_field");
             if (responseHTML != "нет заявок") {
                 response = Number(responseHTML.textContent.trim().split(" ").shift())
@@ -63,7 +62,6 @@ async function getData(numPage = 1) {
 
             let price_value
             let price_valuta
-
             const priceHTML = task.querySelector(".amount");
             if (priceHTML) {
                 const prices = priceHTML.innerHTML.split("");
