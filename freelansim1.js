@@ -4,7 +4,7 @@ const { JSDOM } = jsdom;
 
 async function getItem(url) {
     const document = (await JSDOM.fromURL(url)).window.document;
-    console.log(document.querySelector(".time_ago").attributes.data-original-title.value)
+    
     return {
         id: task_id = Number(url.split('/').pop().split('-').pop()),
         desc: document.querySelector("p").textContent.replace("↵", " ").replace("\n", " "),
@@ -31,7 +31,7 @@ async function getData(numPage = 1) {
 
     let result = []
     
-    const html = await JSDOM.fromURL("https://www.fl.ru/projects/?page=" + numPage)
+    const html = await JSDOM.fromURL("https://www.weblancer.net/jobs/?page=" + numPage)
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
@@ -42,7 +42,7 @@ async function getData(numPage = 1) {
             const task = new JSDOM(taskHTML).window.document
             const title = task.querySelector(".col-sm-10 .title a").innerHTML;
             const category = task.querySelector(".dot_divided span a").innerHTML;
-            const link = 'https://www.fl.ru' + task.querySelector(".col-sm-10 .title a").attributes.href.value;
+            const link = 'https://www.weblancer.net/' + task.querySelector(".col-sm-10 .title a").attributes.href.value;
             
             const { id, desc, user, view } = await getItem(link);
 
