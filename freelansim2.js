@@ -30,7 +30,7 @@ async function getItem(url) {
 
 async function getCountPage() {
 
-    const html = await JSDOM.fromURL("https://freelance.habr.com/tasks")
+    const html = await JSDOM.fromURL("https://www.fl.ru/projects/")
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
@@ -45,17 +45,17 @@ async function getData(numPage = 1) {
 
     let result = [] //Он сейчас undefined))
     
-    const html = await JSDOM.fromURL("https://freelance.habr.com/tasks?page=" + numPage)
+    const html = await JSDOM.fromURL("https://www.fl.ru/projects/?page=" + numPage)
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const tasksHTML = html.window.document.querySelectorAll(".task");
+    const tasksHTML = html.window.document.querySelectorAll("projects-list");
 
         for (let i = 0; i < tasksHTML.length; i++) {
             const taskHTML = tasksHTML[i].innerHTML;
             const task = new JSDOM(taskHTML).window.document
             const title = task.querySelector(".task__title a").innerHTML;
-            const link = 'https://freelance.habr.com' + task.querySelector(".task__title a").attributes.href.value;
+            const link = 'https://fl.ru' + task.querySelector(".task__title a").attributes.href.value;
         
             let urgent
             const urgentHTML = task.querySelector(".task__urgent");

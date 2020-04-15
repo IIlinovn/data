@@ -35,7 +35,7 @@ async function getData(numPage = 1) {
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const tasksHTML = html.window.document.querySelectorAll(".click_container-link");
+    const tasksHTML = html.window.document.querySelector(".click_container-link");
 
         for (let i = 0; i < tasksHTML.length; i++) {
             const taskHTML = tasksHTML[i].innerHTML;
