@@ -20,7 +20,7 @@ async function getCountPage() {
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const pages_max = html.window.document.querySelector('.pagination_box .no-gutters .text-right a').attributes.href.value
+    const pages_max = html.window.document.querySelector('.pagination_box .no-gutters .text-right a').attributes.href.value.split('=')[1]
     
     return Number(pages_max);
 }
