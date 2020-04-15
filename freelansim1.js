@@ -86,6 +86,8 @@ async function main(flag = false, callback) {
             console.log('page #' + (i + 1))
             const result = (await getData(i+1).catch(e => []));
             callback(result)
+            // Добавил пример синхронного таймера
+            await new Promise((resolve) => setTimeout(() => resolve(), 1000 * 1))
         }
     } else {
         callback(await getData());
