@@ -5,20 +5,22 @@ const { JSDOM } = jsdom;
 async function getItem(url) {
     const document = (await JSDOM.fromURL(url)).window.document;
     
+    let task_id = Number(url.split("/")[4])
+    
     const tags = []
 
-    const tagsHTML = await document.querySelectorAll(".tags__item_link");
+    const tagsHTML = await document.querySelectorAll("#project_info_" + task_id + ".b-layout .b-layout__txt_padbot_20 a");
 
     for (let i = 0; i < tagsHTML.length; i++)
         tags.push(tagsHTML[i].innerHTML)
 
     return {
-        //id: task_id = url.split('/').pop(),
-       // tags: tags,
-       // desc: document.querySelector(".task__description").textContent.trim().replace("\n", " ").replace(" \n", " ").replace("\n\n", " "),
-      //  price_value = Number.parseInt(document.querySelector('.b-layout__txt .b-layout__bold').textContent.trim().split(" ").shift()),
-      //  price_valuta = document.querySelector('.b-layout__txt .b-layout__bold').textContent.trim().split(" ").pop(),
-      //  date_in: document.querySelector(".task__meta").textContent.split('•')[0].trim(),
+        id: task_id,
+        tags: tags,
+        desc: document.querySelector("#project_info_" + task_id + " " + "#projectp" + task_id).textContent.trim(),
+       // price_value = Number.parseInt(document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").reverse().slice(1).reverse().join().replace(",", "")),
+        //price_valuta = document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").pop(),
+        date_in: document.querySelectorAll(".b-layout__txt.b-layout__txt_padbot_30 .b-layout__txt.b-layout__txt_fontsize_11")[1].textContent.trim().split("[").pop().split(":").slice(1).join().replace("]", "").replace(",", ":").replace(" |", ","),
        // user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
        // user: document.querySelector(".fullname a").textContent
     }
@@ -54,7 +56,7 @@ async function getData(numPage = 1) {
            // const category = task.querySelector(".b-post__foot span.b-post__txt span.b-post__bold").innerHTML;
             const link = 'https://www.weblancer.net/' + task.querySelector(".b-post__title  a").attributes.href.value;
         
-            const { id, tags, desc, price_value, price_valuta, date_in, user_id, user } = await getItem(link);
+            const { id, tags, desc, price_value, price_valuta, date_in } = await getItem(link);
             
             let anons = task.querySelector("b-post__body .b-post__txt").textContent
 
@@ -88,7 +90,7 @@ async function getData(numPage = 1) {
                 forAll = "Для всех"
             }
 
-            result.push({ id, isHidden, title, urgent, tags, safe, forAll, anons, price_value, price_valuta, anons, desc, date_in, response, view, user_id, user })
+            result.push({ id, isHidden, title, urgent, tags, safe, forAll, anons, price_value, price_valuta, anons, desc, date_in, response, view })
         
         }
 
