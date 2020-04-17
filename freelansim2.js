@@ -26,15 +26,11 @@ async function getItem(url) {
 
 async function getCountPage() {
 
-    const html = await JSDOM.fromURL("https://www.fl.ru/projects/")
+    //const html = await JSDOM.fromURL("https://www.fl.ru/projects/")
 
-    fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
+    //fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    ('.b-pager__back-next')
-
-    body.querySelectorAll('#projects-list').length
-
-    const pages_max = html.window.document.querySelectorAll('#projects-list').length
+    const pages_max = 355
     
     return Number(pages_max);
 }
@@ -58,20 +54,33 @@ async function getData(numPage = 1) {
             const category = task.querySelector(".b-post__foot span.b-post__bold").innerHTML;
             const link = 'https://www.weblancer.net/' + task.querySelector(".b-post__title  a").attributes.href.value;
         
+            const { id, desc, date_in, user_id, user } = await getItem(link);
+            
             let anons = task.querySelector("b-post__body .b-post__txt").textContent
 
             let safe
-            const safeHTML = task.querySelector(".b-post__price a");
+            const safeHTML = task.querySelector(".b-post__price a")
             if (safeHTML) { 
                 safe = safeHTML.textContent }
             
-            let response = Number(task.querySelector('.b-post__foot a').textContent.split(" ").shift())
+            let response
+            const responseHTML = task.querySelector('.b-post__foot a')
+            if(responseHTML.textContent != "Нет ответов") {
+             response = Number(responseHTML.textContent.split(" ").shift())
+            } else response = 0
 
             let view = Number(task.querySelector('.b-post__foot span.b-post__txt').textContent.trim())
+            
+            let isHidden = false
+            const hiddenHTML = task.querySelector('.b-post__foot .b-post__txt .b-post__only')
+            if(hiddenHTML.textContent != " ") {
+                isHidden = true
+            } 
+        
 
-            const { id, desc, price_value, price_valuta, date_in, response, view, user_id, user, finished, in_work, feedbacks } = await getItem(link);
+            
 
-            result.push({ id, title, category, safe, price_value, price_valuta, anons, desc, date_in, response, view, user_id, user })
+            result.push({ id, isHidden, title, category, safe, anons, price_value, price_valuta, anons, desc, date_in, response, view, user_id, user })
         
         }
 

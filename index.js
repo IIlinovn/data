@@ -1,5 +1,5 @@
 const fs = require("fs");
-let freelansim = require('./freelansim')
+//let freelansim = require('./freelansim')
 let freelansim1 = require('./freelansim1')
 //let freelansim2 = require('./freelansim2')
 
@@ -8,5 +8,5 @@ function send(result) {
 }
 
 //freelansim(false, send);
-freelansim1(false, send);
+freelansim1(true, send);
 //freelansim2(false, send);

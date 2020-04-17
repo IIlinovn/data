@@ -7,10 +7,10 @@ async function getItem(url) {
 
     try {
         return {
-            id: task_id = Number(url.split('/').pop().split('-').pop()),
-            desc: document.querySelector("p").textContent.replace("↵", " ").replace("\n", " "),
+            id: task_id = Number(url.split("/")[5].split("-").pop()),
+            desc: document.querySelector(".text_field p").textContent.replace("↵", " ").replace("\n", " "),
             view: Number(document.querySelector(".dot_divided").lastElementChild.textContent.split(' ').shift()),
-            user: document.querySelector(".name").textContent,
+            user: document.querySelector(".name a").textContent,
             date_in: document.querySelector(".time_ago").attributes.title.value.replace(" в", ","),
         }
     } catch (error) {
@@ -67,7 +67,7 @@ async function getData(numPage = 1) {
 
         let response
         const responseHTML = task.querySelector(".col-sm-2 .text_field");
-        if (responseHTML != "нет заявок") {
+        if (responseHTML.textContent != "нет заявок") {
             response = Number(responseHTML.textContent.trim().split(" ").shift())
         } else { response = 0 }
 
@@ -76,9 +76,9 @@ async function getData(numPage = 1) {
         let price_valuta
         const priceHTML = task.querySelector(".amount");
         if (priceHTML) {
-            const prices = priceHTML.innerHTML.split("");
-            price_value = Number.parseInt(prices.splice(1).join().replace(",", ""))
-            price_valuta = prices.splice(0, 1);
+            const prices = priceHTML.textContent;
+            price_value = Number(prices.slice(1))
+            price_valuta = prices.slice(0, 1)
         }
 
         result.push({ id, title, category, anons, date_in, success, price_value, price_valuta, desc, user, view, response })
@@ -96,8 +96,9 @@ async function main(flag = false, callback) {
             console.log('page #' + (i + 1))
             const result = (await getData(i + 1).catch(e => []));
             callback(result)
-            // Добавил пример синхронного таймера
-            await new Promise((resolve) => setTimeout(() => resolve(), 1000 * 1))
+            if(i % 5 == 0){
+                await new Promise((resolve) => setTimeout(() => resolve(), 1000 * 30))
+           }
         }
     } else {
         callback(await getData());
