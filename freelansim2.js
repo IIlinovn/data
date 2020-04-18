@@ -16,7 +16,6 @@ async function getItem(url) {
         for (let i = 0; i < tagsHTML.length; i++)
             tags.push(tagsHTML[i].innerHTML)
     
-<<<<<<< HEAD
             return {
                 id: task_id,
                 tags: tags,
@@ -34,17 +33,6 @@ async function getItem(url) {
             user_fio: '',
             date_in: '',
         }
-=======
-    return {
-        id: task_id,
-        tags: tags,
-        desc: document.querySelector("#project_info_" + task_id + " " + "#projectp" + task_id).textContent.trim(),
-        price_value: document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").reverse().slice(1).reverse().join().replace(",", ""),
-        price_valuta: document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").pop(),
-        date_in: document.querySelectorAll(".b-layout__txt.b-layout__txt_padbot_30 .b-layout__txt.b-layout__txt_fontsize_11")[1].textContent.trim().split("[").pop().split(":").slice(1).join().replace("]", "").replace(",", ":").replace(" |", ","),
-       // user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
-       // user: document.querySelector(".fullname a").textContent
->>>>>>> 642c6f2b39e4199454b0f511606ec6d3a22e4ff0
     }
 }
 
