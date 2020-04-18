@@ -13,12 +13,12 @@ async function getItem(url) {
 
     for (let i = 0; i < tagsHTML.length; i++)
         tags.push(tagsHTML[i].innerHTML)
-
+    
     return {
         id: task_id,
         tags: tags,
         desc: document.querySelector("#project_info_" + task_id + " " + "#projectp" + task_id).textContent.trim(),
-        price_value = Number.parseInt(document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").reverse().slice(1).reverse().join().replace(",", "")),
+        price_value = document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").reverse().slice(1).reverse().join().replace(",", ""),
         price_valuta = document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").pop(),
         date_in: document.querySelectorAll(".b-layout__txt.b-layout__txt_padbot_30 .b-layout__txt.b-layout__txt_fontsize_11")[1].textContent.trim().split("[").pop().split(":").slice(1).join().replace("]", "").replace(",", ":").replace(" |", ","),
        // user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
@@ -53,12 +53,12 @@ async function getData(numPage = 1) {
             const taskHTML = tasksHTML[i].innerHTML;
             const task = new JSDOM(taskHTML).window.document
             const title = task.querySelector(".b-post__title  a").innerHTML;
-           // const category = task.querySelector(".b-post__foot span.b-post__txt span.b-post__bold").innerHTML;
+            const category = task.querySelector(".b-post__foot span.b-post__bold").textContent;
             const link = 'https://www.fl.ru' + task.querySelector(".b-post__title  a").attributes.href.value;
         
             const { id, tags, desc, price_value, price_valuta, date_in } = await getItem(link);
             
-            let anons = task.querySelector("b-post__body .b-post__txt").textContent
+            let anons = task.querySelector(".b-post__body .b-post__txt").textContent
 
             let urgent
             const urgentHTML = task.querySelector(".b-post__title img")
@@ -90,7 +90,7 @@ async function getData(numPage = 1) {
                 forAll = "Для всех"
             }
 
-            result.push({ id, isHidden, title, urgent, tags, safe, forAll, anons, price_value, price_valuta, anons, desc, date_in, response, view })
+            result.push({ id, isHidden, title, urgent, tags, safe, forAll, anons, price_value, price_valuta, anons, desc, category, date_in, response, view })
         
         }
 
