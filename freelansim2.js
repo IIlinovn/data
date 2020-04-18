@@ -18,8 +18,8 @@ async function getItem(url) {
         id: task_id,
         tags: tags,
         desc: document.querySelector("#project_info_" + task_id + " " + "#projectp" + task_id).textContent.trim(),
-        price_value = document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").reverse().slice(1).reverse().join().replace(",", ""),
-        price_valuta = document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").pop(),
+        price_value: document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").reverse().slice(1).reverse().join().replace(",", ""),
+        price_valuta: document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").pop(),
         date_in: document.querySelectorAll(".b-layout__txt.b-layout__txt_padbot_30 .b-layout__txt.b-layout__txt_fontsize_11")[1].textContent.trim().split("[").pop().split(":").slice(1).join().replace("]", "").replace(",", ":").replace(" |", ","),
        // user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
        // user: document.querySelector(".fullname a").textContent
@@ -50,10 +50,10 @@ async function getData(numPage = 1) {
     const tasksHTML = html.window.document.querySelectorAll(".b-post");
 
         for (let i = 0; i < tasksHTML.length; i++) {
-            const taskHTML = tasksHTML[i].innerHTML;
+            const taskHTML = new JSDOM(tasksHTML[i].innerHTML).window.document.body.innerHTML.split(`<script type="text/javascript">document.write('`).map(html => html.split("');")[0]).join('');
             const task = new JSDOM(taskHTML).window.document
             const title = task.querySelector(".b-post__title  a").innerHTML;
-            const category = task.querySelector(".b-post__foot span.b-post__bold").textContent;
+            const category = task.querySelector("span.b-post__bold").textContent;
             const link = 'https://www.fl.ru' + task.querySelector(".b-post__title  a").attributes.href.value;
         
             const { id, tags, desc, price_value, price_valuta, date_in } = await getItem(link);
