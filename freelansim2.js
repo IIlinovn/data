@@ -60,10 +60,10 @@ async function getData(numPage = 1) {
     const tasksHTML = html.window.document.querySelectorAll(".b-post");
 
         for (let i = 0; i < tasksHTML.length; i++) {
-            const taskHTML = tasksHTML[i].innerHTML;
+            const taskHTML = new JSDOM(tasksHTML[i].innerHTML).window.document.body.innerHTML.split(`<script type="text/javascript">document.write('`).map(html => html.split("');")[0]).join('');
             const task = new JSDOM(taskHTML).window.document
             const title = task.querySelector(".b-post__title  a").innerHTML;
-            const category = task.querySelector(".b-post__foot span.b-post__bold").textContent;
+            const category = task.querySelector("span.b-post__bold").textContent;
             const link = 'https://www.fl.ru' + task.querySelector(".b-post__title  a").attributes.href.value;
         
             const { id, tags, desc, price_value, price_valuta, date_in } = await getItem(link);
