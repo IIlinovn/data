@@ -21,7 +21,7 @@ async function getItem(url) {
         response: Number(document.querySelector(".task__meta").textContent.split('•')[1].trim().split('\n').shift()),
         view: Number(document.querySelector(".task__meta").textContent.split('•')[2].trim().split('\n').shift()),
         user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
-        user: document.querySelector(".fullname a").textContent,
+        user_fio: document.querySelector(".fullname a").textContent,
         finished: Number(document.querySelector(".user_statistics").childNodes[5].textContent.trim().split('\n').pop()),
         in_work: Number(document.querySelector(".user_statistics").childNodes[7].textContent.trim().split('\n').pop()),
         feedback_plus: Number(document.querySelector(".user_statistics").childNodes[11].textContent.trim().split('\n').pop().split(" / ").shift()),
@@ -68,7 +68,7 @@ async function getData(numPage = 1) {
             if (safeHTML) { 
                 safe = safeHTML.title }
 
-            const { id, desc, tags, date_in, response, view, user_id, user, finished, in_work, feedback_plus, feedback_minus } = await getItem(link);
+            const { id, desc, tags, date_in, response, view, user_id, user_fio, finished, in_work, feedback_plus, feedback_minus } = await getItem(link);
 
             let price_value
             let price_type
@@ -82,7 +82,7 @@ async function getData(numPage = 1) {
                 price_type = prices[1].replace("проект</span>", "проект").replace("час</span>", "час")
             }
 
-            result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, finished, in_work, feedback_plus, feedback_minus })
+            result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user_fio, finished, in_work, feedback_plus, feedback_minus })
         
         }
 

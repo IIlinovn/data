@@ -10,7 +10,7 @@ async function getItem(url) {
             id: task_id = Number(url.split("/")[5].split("-").pop()),
             desc: document.querySelector(".text_field p").textContent.replace("↵", " ").replace("\n", " "),
             view: Number(document.querySelector(".dot_divided").lastElementChild.textContent.split(' ').shift()),
-            user: document.querySelector(".name a").textContent,
+            user_fio: document.querySelector(".name a").textContent,
             date_in: document.querySelector(".time_ago").attributes.title.value.replace(" в", ","),
         }
     } catch (error) {
@@ -19,7 +19,7 @@ async function getItem(url) {
             id: '',
             desc: '',
             view: '',
-            user: '',
+            user_fio: '',
             date_in: '',
         }
     }
@@ -55,16 +55,16 @@ async function getData(numPage = 1) {
         const category = task.querySelector(".dot_divided span a").innerHTML;
         const link = 'https://www.weblancer.net' + task.querySelector(".col-sm-10 .title a").attributes.href.value;
 
-        const { id, desc, date_in, user, view } = await getItem(link);
+        const { id, desc, date_in, user_fio, view } = await getItem(link);
 
         const anons = task.querySelector(".col-sm-10 p").textContent;
 
-        let success
+        let success = false
         const successHTML = task.querySelector(".text-success");
         if (successHTML) {
-            success = successHTML.textContent
+            success = true
         }
-
+        
         let response
         const responseHTML = task.querySelector(".col-sm-2 .text_field");
         if (responseHTML.textContent != "нет заявок") {
@@ -81,7 +81,7 @@ async function getData(numPage = 1) {
             price_valuta = prices.slice(0, 1)
         }
 
-        result.push({ id, title, category, anons, date_in, success, price_value, price_valuta, desc, user, view, response })
+        result.push({ id, title, category, anons, date_in, success, price_value, price_valuta, desc, user_fio, view, response })
 
     }
 

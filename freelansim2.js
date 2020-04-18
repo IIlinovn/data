@@ -4,25 +4,35 @@ const { JSDOM } = jsdom;
 
 async function getItem(url) {
     const document = (await JSDOM.fromURL(url)).window.document;
-    
-    let task_id = Number(url.split("/")[4])
-    
-    const tags = []
 
-    const tagsHTML = await document.querySelectorAll("#project_info_" + task_id + ".b-layout .b-layout__txt_padbot_20 a");
-
-    for (let i = 0; i < tagsHTML.length; i++)
-        tags.push(tagsHTML[i].innerHTML)
+    try {
     
-    return {
-        id: task_id,
-        tags: tags,
-        desc: document.querySelector("#project_info_" + task_id + " " + "#projectp" + task_id).textContent.trim(),
-        price_value = document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").reverse().slice(1).reverse().join().replace(",", ""),
-        price_valuta = document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").pop(),
-        date_in: document.querySelectorAll(".b-layout__txt.b-layout__txt_padbot_30 .b-layout__txt.b-layout__txt_fontsize_11")[1].textContent.trim().split("[").pop().split(":").slice(1).join().replace("]", "").replace(",", ":").replace(" |", ","),
-       // user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
-       // user: document.querySelector(".fullname a").textContent
+        let task_id = Number(url.split("/")[4])
+    
+        const tags = []
+
+        const tagsHTML = await document.querySelectorAll("#project_info_" + task_id + ".b-layout .b-layout__txt_padbot_20 a");
+
+        for (let i = 0; i < tagsHTML.length; i++)
+            tags.push(tagsHTML[i].innerHTML)
+    
+            return {
+                id: task_id,
+                tags: tags,
+                desc: document.querySelector("#project_info_" + task_id + " " + "#projectp" + task_id).textContent.trim(),
+                price_value: document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").reverse().slice(1).reverse().join().replace(",", ""),
+                price_valuta: document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").pop(),
+                date_in: document.querySelectorAll(".b-layout__txt.b-layout__txt_padbot_30 .b-layout__txt.b-layout__txt_fontsize_11")[1].textContent.trim().split("[").pop().split(":").slice(1).join().replace("]", "").replace(",", ":").replace(" |", ","),
+            }
+    } catch (error) {
+        console.log('Не смог распарсить')
+        return {
+            id: '',
+            desc: '',
+            view: '',
+            user_fio: '',
+            date_in: '',
+        }
     }
 }
 
@@ -60,15 +70,15 @@ async function getData(numPage = 1) {
             
             let anons = task.querySelector(".b-post__body .b-post__txt").textContent
 
-            let urgent
+            let urgent = false
             const urgentHTML = task.querySelector(".b-post__title img")
             if (urgentHTML) { 
-                urgent = "Срочный!" }
+                urgent = true }
             
-            let safe
+            let safe = false
             const safeHTML = task.querySelector(".b-post__price a")
             if (safeHTML) { 
-                safe = safeHTML.textContent }
+                safe = true }
             
             let response
             const responseHTML = task.querySelector('.b-post__foot a')
@@ -84,10 +94,10 @@ async function getData(numPage = 1) {
                 isHidden = true
             } 
             
-            let forAll
+            let forAll = false
             const forAllHTML = task.querySelector(".b-post__foot .b-post__txt span.b-post__bold i")
             if (forAllHTML) {
-                forAll = "Для всех"
+                forAll = true
             }
 
             result.push({ id, isHidden, title, urgent, tags, safe, forAll, anons, price_value, price_valuta, anons, desc, category, date_in, response, view })
@@ -105,6 +115,9 @@ async function main(flag = false, callback) {
             console.log('page #' + (i + 1))
             const result = (await getData(i+1).catch(e => []));
             callback(result)
+            if(i % 5 == 0){
+                await new Promise((resolve) => setTimeout(() => resolve(), 1000 * 30))
+           }
         }
     } else {
         callback(await getData());
