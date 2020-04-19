@@ -1,7 +1,7 @@
 const fs = require("fs");
 //let freelansim = require('./freelansim')
 //let freelansim1 = require('./freelansim1')
-freelansim2 = require('./freelansim2')
+let freelansim2 = require('./freelansim2')
 
 function send(result) {
     fs.writeFileSync('result.json', JSON.stringify(result, 2, 2))

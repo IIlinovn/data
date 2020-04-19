@@ -28,9 +28,10 @@ async function getItem(url) {
         console.log('Не смог распарсить')
         return {
             id: '',
+            tags: [],
             desc: '',
-            view: '',
-            user_fio: '',
+            price_value: 0,
+            price_valuta: '',
             date_in: '',
         }
     }
