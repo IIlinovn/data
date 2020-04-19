@@ -84,7 +84,7 @@ async function getData(numPage = 1) {
             user_id = task.querySelector("a.b-avatar").attributes.href.value.slice(2)
             user_fio = task.querySelector("a.b-tasks__item__user_name").textContent
 
-            let price_value;
+            let price_value
             let price_valuta
             let maxprice
 
