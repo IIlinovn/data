@@ -9,4 +9,4 @@ function send(result) {
 
 //freelansim(false, send);
 //freelansim1(true, send);
-freelansim2(false, send);
+freelansim2(true, send);

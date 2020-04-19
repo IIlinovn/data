@@ -34,19 +34,19 @@ async function getItem(url) {
         return {
             id: '',
             title: '',
-            tags: [],
+            tags: '',
             desc: '',
-            price_value: 0,
+            price_value: '',
             price_valuta: '',
             date_in: '',
-            response: 0,
-            view: 0,
+            response: '',
+            view: '',
             user_login: '',
             user_fio: '',
-            finished: 0,
-            in_work: 0,
-            feedback_plus: 0,
-            feedback_minus: 0
+            finished: '',
+            in_work: '',
+            feedback_plus: '',
+            feedback_minus: ''
         }
     }
 }

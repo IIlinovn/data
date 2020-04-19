@@ -15,18 +15,15 @@ async function getItem(url) {
             ags.push(tagsHTML[i].innerHTML)
 
         return {
-            id: task_id = url.split('/').pop(),
+            id: task_id = Number(url.split('/').pop()),
             title: document.querySelector(".task__title").textContent,
             desc: document.querySelector(".task__description").textContent.trim().replace("\n", " ").replace(" \n", " ").replace("\n\n", " "),
             tags: tags,
             date_in: document.querySelector(".task__meta").textContent.split('•')[0].trim(),
             response: document.querySelector(".task__meta").textContent.split('•')[1].trim().replace("\n", "").replace("\nотклик", "отклик").replace("\nотклика", "отклика").replace("\nоткликов", "откликов"),
             view: document.querySelector(".task__meta").textContent.split('•')[2].trim().replace("\n", "").replace("\nпросмотр", "просмотр").replace("\nпросмотра", "просмотра").replace("\nпросмотров", "просмотров"),
-            user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
-            user_fio: document.querySelector(".fullname a").textContent,
             finished: document.querySelector(".user_statistics").childNodes[5].textContent.trim().replace("\n", " "),
             in_work: document.querySelector(".user_statistics").childNodes[7].textContent.trim().replace("\n", " ").replace(" \n", " "),
-            feedbacks: document.querySelector(".user_statistics").childNodes[11].textContent.trim().replace("\n", " "),
         }
     } catch (error) {
         console.log('Не смог распарсить')
@@ -42,11 +39,11 @@ async function getItem(url) {
 
 async function getCountPage() {
 
-    const html = await JSDOM.fromURL("https://freelance.habr.com/tasks")
+    //const html = await JSDOM.fromURL("https://youdo.com/tasks-all-any-webdevelopment-1")
 
-    fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
+    //fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const pages_max = html.window.document.querySelector('.pagination').childNodes[14].textContent
+    const pages_max = 210
     
     return Number(pages_max);
 }
@@ -55,41 +52,60 @@ async function getCountPage() {
 
 async function getData(numPage = 1) {
 
-    let result = [] //Он сейчас undefined))
+    let result = []
     
-    const html = await JSDOM.fromURL("https://freelance.habr.com/tasks?page=" + numPage)
+    const html = await JSDOM.fromURL("https://youdo.com/tasks-all-any-webdevelopment-1?page=" + numPage)
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const tasksHTML = html.window.document.querySelectorAll(".task");
+    const tasksHTML = html.window.document.querySelectorAll(".b-tasks__item__wrapper");
 
         for (let i = 0; i < tasksHTML.length; i++) {
             const taskHTML = tasksHTML[i].innerHTML;
             const task = new JSDOM(taskHTML).window.document
-            const title = task.querySelector(".task__title a").innerHTML;
-            const link = 'https://freelance.habr.com' + task.querySelector(".task__title a").attributes.href.value;
+            const title = task.querySelector("a.b-tasks__item__title").innerHTML;
+            const link = 'https://youdo.com' + task.querySelector("a.b-tasks__item__title").attributes.href.value;
         
+            const { id, desc, tags, date_in, response, view, finished, in_work } = await getItem(link);
+
+            let isVacancy = false
+            const isVacancyHTML = task.querySelector(".b-tasks__item__business");
+            if(isVacancyHTML.textContent == "Вакансия") {
+                isVacancy = true
+            }
         
             let safe = false
-            const safeHTML = task.querySelector(".safe-deal-icon");
+            const safeHTML = task.querySelector(".b-tasks__item__sbr");
             if (safeHTML) { 
                 safe = true }
+            
+            let user_id
+            let user_fio
+            user_id = task.querySelector("a.b-avatar").attributes.href.value.slice(2)
+            user_fio = task.querySelector("a.b-tasks__item__user_name").textContent
 
-            const { id, desc, tags, date_in, response, view, user_id, user, finished, in_work, feedbacks } = await getItem(link);
-
-            let price_value
-            let price_type
+            let price_value;
             let price_valuta
+            let maxprice
 
-            const priceHTML = task.querySelector(".count");
+            const priceHTML = task.querySelector(".b-tasks__item__price");
             if (priceHTML) {
-                const prices = priceHTML.innerHTML.split(/ <span class="suffix">/);
-                price_value = Number.parseInt(prices[0].replace(' ', ''))
-                price_valuta = prices[0].split(" ").pop();
-                price_type = prices[1].replace("проект</span>", "проект").replace("час</span>", "час")
+                const prices = priceHTML.innerHTML.trim().split(" ");
+                price_valuta = prices.pop();
+                (prices.indexOf("до") != 0) ? price_value = Number(prices.slice(0, 2).join().replace(",", "")) : maxprice = Number(prices.slice(1, 3).join().replace(",", ""))
             }
 
-            result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, finished, in_work, feedbacks })
+            let feedback_plus
+            let feedback_minus
+            if(task.querySelector("p.b-tasks__item__user_reviews span").textContent == "Нет отзывов") {
+                feedback_plus = 0
+                feedback_minus = 0
+            } else {
+                feedback_plus = Number(task.querySelector("span.b-icon-reviews-positive").textContent)
+                feedback_minus = Number(task.querySelector("span.b-icon-reviews-negative").textContent)
+            }
+
+            result.push({ id, title, isVacancy, urgent, safe, price_value, maxprice, price_valuta, desc, date_in, response, view, tags, user_id, user_fio, finished, in_work, feedback_plus, feedback_minus })
         
         }
 

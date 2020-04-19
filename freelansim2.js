@@ -28,9 +28,9 @@ async function getItem(url) {
         console.log('Не смог распарсить')
         return {
             id: '',
-            tags: [],
+            tags: '',
             desc: '',
-            price_value: 0,
+            price_value: '',
             price_valuta: '',
             date_in: '',
         }
@@ -64,12 +64,17 @@ async function getData(numPage = 1) {
             const taskHTML = new JSDOM(tasksHTML[i].innerHTML).window.document.body.innerHTML.split(`<script type="text/javascript">document.write('`).map(html => html.split("');")[0]).join('');
             const task = new JSDOM(taskHTML).window.document
             const title = task.querySelector(".b-post__title  a").innerHTML;
-            const category = task.querySelector("span.b-post__bold").textContent;
             const link = 'https://www.fl.ru' + task.querySelector(".b-post__title  a").attributes.href.value;
         
             const { id, tags, desc, price_value, price_valuta, date_in } = await getItem(link);
             
             let anons = task.querySelector(".b-post__body .b-post__txt").textContent
+
+            let isVacancy = false
+            const isVacancyHTML = task.querySelector("span.b-post__bold");
+            if(isVacancyHTML.textContent == "Вакансия") {
+                isVacancy = true
+            }
 
             let urgent = false
             const urgentHTML = task.querySelector(".b-post__title img")
@@ -101,7 +106,7 @@ async function getData(numPage = 1) {
                 forAll = true
             }
 
-            result.push({ id, isHidden, title, urgent, tags, safe, forAll, anons, price_value, price_valuta, anons, desc, category, date_in, response, view })
+            result.push({ id, isHidden, title, urgent, tags, safe, forAll, anons, price_value, price_valuta, anons, desc, isVacancy, date_in, response, view })
         
         }
 
