@@ -49,8 +49,9 @@ async function getData(numPage = 1) {
 
     const tasksHTML = html.window.document.querySelectorAll(".b-tasks__item__wrapper");
 
-        for (let i = 0; i < tasksHTML.length; i++) {
-            const task = tasksHTML[i].innerHTML;
+        for (let i = 0; i < tasksHTML.length; i++) {      
+            const taskHTML = tasksHTML[i].innerHTML;
+            const task = new JSDOM(taskHTML).window.document;   
             const title = task.querySelector("b-tasks__item__title_wrapper a.b-tasks__item__title").innerHTML;
             const link = 'https://youdo.com' + task.querySelector("a.b-tasks__item__title").attributes.href.value;
         
