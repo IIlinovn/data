@@ -61,7 +61,13 @@ async function getData(numPage = 1) {
             if(isVacancyHTML.textContent == "Вакансия") {
                 isVacancy = true
             }
-        
+
+            let success = false
+            const successHTML = task.querySelector(".item___72b99.status___05114");
+            if (successHTML.textContent != "Открыто") {
+                success = true
+            }
+
             let safe = false
             const safeHTML = task.querySelector(".b-tasks__item__sbr");
             if (safeHTML) { 
