@@ -113,14 +113,21 @@ async function main(flag = false, callback) {
         const countPage = await getCountPage();
         for(let i=0; i<countPage; i++) {
             console.log('page #' + (i + 1))
-            const result = (await getData(i+1).catch(e => []));
+            const result = (await getData(i+1).catch(e => {
+                console.error(e);
+                return [];
+            }));
             callback(result)
             if(i % 5 == 0){
                 await new Promise((resolve) => setTimeout(() => resolve(), 1000 * 30))
            }
         }
     } else {
-        callback(await getData());
+        try {
+            callback(await getData());
+        } catch (error) {
+            console.error(error);
+        }
     }
     console.log('Done')
 }
