@@ -47,26 +47,25 @@ async function getData(numPage = 1) {
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const tasksHTML = html.window.document.querySelectorAll(".b-tasks__item__wrapper");
+    const tasksHTML = html.window.document.querySelectorAll(".b-tasks__item:not(.hidden)");
 
         for (let i = 0; i < tasksHTML.length; i++) {      
-            const taskHTML = tasksHTML[i].innerHTML;
-            const task = new JSDOM(taskHTML).window.document;   
-            const title = task.querySelector("b-tasks__item__title_wrapper a.b-tasks__item__title").innerHTML;
+            const task = tasksHTML[i];  
+            const title = task.querySelector(" a.b-tasks__item__title").innerHTML;
             const link = 'https://youdo.com' + task.querySelector("a.b-tasks__item__title").attributes.href.value;
         
             const { id, desc, category, date_in, view  } = await getItem(link);
 
             let isVacancy = false
             const isVacancyHTML = task.querySelector(".b-tasks__item__business");
-            if(isVacancyHTML.textContent == "Вакансия") {
+            if(isVacancyHTML) {
                 isVacancy = true
             }
 
-            let success = false
-            const successHTML = task.querySelector(".item___72b99.status___05114");
-            if (successHTML.textContent != "Открыто") {
-                success = true
+            let success = true
+            const successHTML = task.querySelector(".item___72b99.status___05114 .i-new___5d5e0");
+            if (successHTML) {
+                success = false
             }
 
             let safe = false
@@ -97,10 +96,10 @@ async function getData(numPage = 1) {
                 feedback_minus = 0
             } else {
                 feedback_plus = Number(task.querySelector("span.b-icon-reviews-positive").textContent)
-                feedback_minus = Number(task.querySelector("span.b-icon-reviews-negative").textContent)
+                //feedback_minus = Number(task.querySelector("span.b-icon-reviews-negative").textContent)
             }
 
-            result.push({ id, title, isVacancy, urgent, safe, price_value, maxprice, price_valuta, desc, date_in, category, view, tags, user_id, user_fio, finished, in_work, feedback_plus, feedback_minus })
+            result.push({ id, title, isVacancy, safe, price_value, maxprice, price_valuta, desc, date_in, category, view, user_id, user_fio, feedback_plus, feedback_minus })
         
         }
 
