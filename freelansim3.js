@@ -7,23 +7,12 @@ async function getItem(url) {
     
     try {
     
-        const tags = []
-
-        const tagsHTML = await document.querySelectorAll(".tags__item_link");
-
-        for (let i = 0; i < tagsHTML.length; i++)
-            ags.push(tagsHTML[i].innerHTML)
-
         return {
-            id: task_id = Number(url.split('/').pop()),
-            title: document.querySelector(".task__title").textContent,
-            desc: document.querySelector(".task__description").textContent.trim().replace("\n", " ").replace(" \n", " ").replace("\n\n", " "),
-            tags: tags,
-            date_in: document.querySelector(".task__meta").textContent.split('•')[0].trim(),
-            response: document.querySelector(".task__meta").textContent.split('•')[1].trim().replace("\n", "").replace("\nотклик", "отклик").replace("\nотклика", "отклика").replace("\nоткликов", "откликов"),
-            view: document.querySelector(".task__meta").textContent.split('•')[2].trim().replace("\n", "").replace("\nпросмотр", "просмотр").replace("\nпросмотра", "просмотра").replace("\nпросмотров", "просмотров"),
-            finished: document.querySelector(".user_statistics").childNodes[5].textContent.trim().replace("\n", " "),
-            in_work: document.querySelector(".user_statistics").childNodes[7].textContent.trim().replace("\n", " ").replace(" \n", " "),
+            id: task_id = Number(url.split('/').pop().slice(1)),
+            desc: document.querySelector(".b-task-block__description span").textContent,
+            date_in: document.querySelector(".b-task-block__info .date-value").textContent,
+            category: document.querySelectorAll(".item___72b99")[3].textContent,
+            view: document.querySelectorAll(".item___72b99")[1].textContent.split(" ").shift(),
         }
     } catch (error) {
         console.log('Не смог распарсить')
@@ -31,7 +20,7 @@ async function getItem(url) {
             id: '',
             desc: '',
             view: '',
-            user_fio: '',
+            category: '',
             date_in: '',
         }
     }
@@ -61,12 +50,11 @@ async function getData(numPage = 1) {
     const tasksHTML = html.window.document.querySelectorAll(".b-tasks__item__wrapper");
 
         for (let i = 0; i < tasksHTML.length; i++) {
-            const taskHTML = tasksHTML[i].innerHTML;
-            const task = new JSDOM(taskHTML).window.document
-            const title = task.querySelector("a.b-tasks__item__title").innerHTML;
+            const task = tasksHTML[i].innerHTML;
+            const title = task.querySelector("b-tasks__item__title_wrapper a.b-tasks__item__title").innerHTML;
             const link = 'https://youdo.com' + task.querySelector("a.b-tasks__item__title").attributes.href.value;
         
-            const { id, desc, tags, date_in, response, view, finished, in_work } = await getItem(link);
+            const { id, desc, category, date_in, view  } = await getItem(link);
 
             let isVacancy = false
             const isVacancyHTML = task.querySelector(".b-tasks__item__business");
@@ -78,7 +66,7 @@ async function getData(numPage = 1) {
             const safeHTML = task.querySelector(".b-tasks__item__sbr");
             if (safeHTML) { 
                 safe = true }
-            
+
             let user_id
             let user_fio
             user_id = task.querySelector("a.b-avatar").attributes.href.value.slice(2)
@@ -105,7 +93,7 @@ async function getData(numPage = 1) {
                 feedback_minus = Number(task.querySelector("span.b-icon-reviews-negative").textContent)
             }
 
-            result.push({ id, title, isVacancy, urgent, safe, price_value, maxprice, price_valuta, desc, date_in, response, view, tags, user_id, user_fio, finished, in_work, feedback_plus, feedback_minus })
+            result.push({ id, title, isVacancy, urgent, safe, price_value, maxprice, price_valuta, desc, date_in, category, view, tags, user_id, user_fio, finished, in_work, feedback_plus, feedback_minus })
         
         }
 
