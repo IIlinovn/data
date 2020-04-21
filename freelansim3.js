@@ -9,10 +9,10 @@ async function getItem(url) {
     
         return {
             id: task_id = Number(url.split('/').pop().slice(1)),
-            desc: document.querySelector(".b-task-block__description span").textContent,
+            desc: document.querySelector(".b-task-block__description span").textContent.replace("\n", " "). replace(".\n", ". "),
             date_in: document.querySelector(".b-task-block__info .date-value").textContent,
-            category: document.querySelectorAll(".item___72b99")[3].textContent,
-            view: document.querySelectorAll(".item___72b99")[1].textContent.split(" ").shift(),
+            category: document.querySelector("[itemprop=serviceType]").textContent.replace("\n", " ").trim(),
+            view: document.querySelector(".b-task-brief__item--status + li").textContent.split(" ").shift(),
         }
     } catch (error) {
         console.log('Не смог распарсить')
@@ -62,10 +62,10 @@ async function getData(numPage = 1) {
                 isVacancy = true
             }
 
-            let success = true
-            const successHTML = task.querySelector(".item___72b99.status___05114 .i-new___5d5e0");
+            let success = false
+            const successHTML = task.querySelector(".item___72b99.status___05114:not(.i-new___5d5e0)");
             if (successHTML) {
-                success = false
+                success = true
             }
 
             let safe = false
@@ -75,7 +75,7 @@ async function getData(numPage = 1) {
 
             let user_id
             let user_fio
-            user_id = task.querySelector("a.b-avatar").attributes.href.value.slice(2)
+            user_id = Number(task.querySelector("a.b-avatar").attributes.href.value.slice(2))
             user_fio = task.querySelector("a.b-tasks__item__user_name").textContent
 
             let price_value
@@ -96,10 +96,12 @@ async function getData(numPage = 1) {
                 feedback_minus = 0
             } else {
                 feedback_plus = Number(task.querySelector("span.b-icon-reviews-positive").textContent)
-                //feedback_minus = Number(task.querySelector("span.b-icon-reviews-negative").textContent)
+                if(task.querySelector("span.b-icon-reviews-negative")) {
+                    feedback_minus = Number(task.querySelector("span.b-icon-reviews-negative").textContent)
+                } else feedback_minus = 0
             }
 
-            result.push({ id, title, isVacancy, safe, price_value, maxprice, price_valuta, desc, date_in, category, view, user_id, user_fio, feedback_plus, feedback_minus })
+            result.push({ id, title, isVacancy, success, safe, price_value, maxprice, price_valuta, desc, date_in, category, view, user_id, user_fio, feedback_plus, feedback_minus })
         
         }
 
