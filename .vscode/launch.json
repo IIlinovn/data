@@ -12,6 +12,15 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}\\index.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Work mode",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\work.js"
         }
     ]
 }

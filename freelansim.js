@@ -105,8 +105,7 @@ async function getData(numPage = 1) {
                 price_type = prices[1].replace("проект</span>", "проект").replace("час</span>", "час")
             }
 
-            result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_login, user_fio, finished, in_work, feedback_plus, feedback_minus })
-        
+            result.push({ site: 'freelance.habr.com', id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_login, user_fio, finished, in_work, feedback_plus, feedback_minus })
         }
 
     return result;

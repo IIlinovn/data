@@ -2,3 +2,4 @@ node_modules/
 hh.html
 result.json
 package-lock.json
+yarn.lock
