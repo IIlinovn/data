@@ -54,6 +54,7 @@ async function getData(numPage = 1) {
             const title = task.querySelector(" a.b-tasks__item__title").innerHTML;
             const link = 'https://youdo.com' + task.querySelector("a.b-tasks__item__title").attributes.href.value;
         
+            let link_page = link.split("//").pop()
             const { id, desc, category, date_in, view  } = await getItem(link);
 
             let isVacancy = false
@@ -101,7 +102,7 @@ async function getData(numPage = 1) {
                 } else feedback_minus = 0
             }
 
-            result.push({ id, title, isVacancy, success, safe, price_value, maxprice, price_valuta, desc, date_in, category, view, user_id, user_fio, feedback_plus, feedback_minus })
+            result.push({  site: 'weblancer.net', link_page, id, title, isVacancy, success, safe, price_value, maxprice, price_valuta, desc, date_in, category, view, user_id, user_fio, feedback_plus, feedback_minus })
         
         }
 

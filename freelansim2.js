@@ -22,7 +22,7 @@ async function getItem(url) {
                 desc: document.querySelector("#project_info_" + task_id + " " + "#projectp" + task_id).textContent.trim(),
                 price_value: document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").reverse().slice(1).reverse().join().replace(",", ""),
                 price_valuta: document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").pop(),
-                date_in: document.querySelectorAll(".b-layout__txt.b-layout__txt_padbot_30 .b-layout__txt.b-layout__txt_fontsize_11")[1].textContent.trim().split("[").pop().split(":").slice(1).join().replace("]", "").replace(",", ":").replace(" |", ","),
+                date_in: document.querySelectorAll(".b-layout__txt.b-layout__txt_padbot_30 .b-layout__txt.b-layout__txt_fontsize_11")[1].textContent.trim().replace(" |", ",").split("\n").shift().trim(),
             }
     } catch (error) {
         console.log('Не смог распарсить')
@@ -66,6 +66,7 @@ async function getData(numPage = 1) {
             const title = task.querySelector(".b-post__title  a").innerHTML;
             const link = 'https://www.fl.ru' + task.querySelector(".b-post__title  a").attributes.href.value;
         
+            let link_page = link.split("//").pop()
             const { id, tags, desc, price_value, price_valuta, date_in } = await getItem(link);
             
             let anons = task.querySelector(".b-post__body .b-post__txt").textContent
@@ -87,18 +88,18 @@ async function getData(numPage = 1) {
                 safe = true }
             
             let response
-            const responseHTML = task.querySelector('.b-post__foot a')
-            if(responseHTML.textContent != "Нет ответов") {
-             response = Number(responseHTML.textContent.split(" ").shift())
-            } else response = 0
+            //const responseHTML = task.querySelector('.b-post__foot a.b-post__link')
+            //if(responseHTML.textContent === "Нет ответов") {
+           //  response = 0
+           // } else response = Number(responseHTML.textContent.split(" ").shift())
 
-            let view = Number(task.querySelector('.b-post__foot span.b-post__txt').textContent.trim())
+            let view //= Number(task.querySelector('.b-post__foot span.b-post__txt').textContent.trim())
             
             let isHidden = false
             const hiddenHTML = task.querySelector('.b-post__foot .b-post__txt .b-post__only')
-            if(hiddenHTML.textContent != " ") {
-                isHidden = true
-            } 
+            //if(hiddenHTML.textContent != " ") {
+            //    isHidden = true
+           // } 
             
             let forAll = false
             const forAllHTML = task.querySelector(".b-post__foot .b-post__txt span.b-post__bold i")
@@ -106,7 +107,7 @@ async function getData(numPage = 1) {
                 forAll = true
             }
 
-            result.push({ id, isHidden, title, urgent, tags, safe, forAll, anons, price_value, price_valuta, anons, desc, isVacancy, date_in, response, view })
+            result.push({  site: 'fl.ru', link_page, id, isHidden, title, urgent, tags, safe, forAll, anons, price_value, price_valuta, anons, desc, isVacancy, date_in, response, view })
         
         }
 
@@ -119,14 +120,21 @@ async function main(flag = false, callback) {
         const countPage = await getCountPage();
         for(let i=0; i<countPage; i++) {
             console.log('page #' + (i + 1))
-            const result = (await getData(i+1).catch(e => []));
+            const result = (await getData(i+1).catch(e => {
+                console.error(e);
+                return [];
+            }));
             callback(result)
             if(i % 5 == 0){
                 await new Promise((resolve) => setTimeout(() => resolve(), 1000 * 30))
            }
         }
     } else {
-        callback(await getData());
+        try {
+            callback(await getData());
+        } catch (error) {
+            console.error(error);
+        }
     }
     console.log('Done')
 }

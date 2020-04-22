@@ -54,7 +54,8 @@ async function getData(numPage = 1) {
         const title = task.querySelector(".col-sm-10 .title a").innerHTML;
         const category = task.querySelector(".dot_divided span a").innerHTML;
         const link = 'https://www.weblancer.net' + task.querySelector(".col-sm-10 .title a").attributes.href.value;
-
+        
+        let link_page = link.split("//").pop()
         const { id, desc, date_in, user_fio, view } = await getItem(link);
 
         const anons = task.querySelector(".col-sm-10 p").textContent;
@@ -81,7 +82,7 @@ async function getData(numPage = 1) {
             price_valuta = prices.slice(0, 1)
         }
 
-        result.push({ id, title, category, anons, date_in, success, price_value, price_valuta, desc, user_fio, view, response })
+        result.push({ site: 'weblancer.net', id, title, link_page, category, anons, date_in, success, price_value, price_valuta, desc, user_fio, view, response })
 
     }
 
