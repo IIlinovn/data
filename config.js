@@ -1,4 +1,4 @@
 module.exports = {
-    base_url: 'http://localhost:8000',
+    base_url: 'http://ovz1.iilinov-n.pr46m.vps.myjino.ru',
     group: 'api',
 }

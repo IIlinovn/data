@@ -16,6 +16,15 @@
         {
             "type": "node",
             "request": "launch",
+            "name": "test mode",
+            "skipFiles": [
+                "<node_internals>/**"
+            ],
+            "program": "${workspaceFolder}\\work.js"
+        },
+        {
+            "type": "node",
+            "request": "launch",
             "name": "Work mode",
             "skipFiles": [
                 "<node_internals>/**"
