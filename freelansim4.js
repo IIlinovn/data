@@ -6,36 +6,39 @@ async function getItem(url) {
     const document = (await JSDOM.fromURL(url)).window.document;
 
     const tags = []
-
-    const tagsHTML = await document.querySelectorAll(".tags__item_link");
-
+    const tagsHTML = await document.querySelectorAll("ul.breadcrumb li a");
     for (let i = 0; i < tagsHTML.length; i++)
-        tags.push(tagsHTML[i].innerHTML)
+            tags.push(tagsHTML[i].innerHTML)
 
-    return {
-        id: task_id = Number(url.split('/').pop()),
-        title: document.querySelector(".task__title").textContent,
-        desc: document.querySelector(".task__description").textContent.trim().replace("\n", " ").replace(" \n", " ").replace("\n\n", " "),
-        tags: tags,
-        date_in: document.querySelector(".task__meta").textContent.split('•')[0].trim(),
-        response: Number(document.querySelector(".task__meta").textContent.split('•')[1].trim().split('\n').shift()),
-        view: Number(document.querySelector(".task__meta").textContent.split('•')[2].trim().split('\n').shift()),
-        user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
-        user: document.querySelector(".fullname a").textContent,
-        finished: Number(document.querySelector(".user_statistics").childNodes[5].textContent.trim().split('\n').pop()),
-        in_work: Number(document.querySelector(".user_statistics").childNodes[7].textContent.trim().split('\n').pop()),
-        feedback_plus: Number(document.querySelector(".user_statistics").childNodes[11].textContent.trim().split('\n').pop().split(" / ").shift()),
-        feedback_minus: Number(document.querySelector(".user_statistics").childNodes[11].textContent.trim().split('\n').pop().split(" / ").pop())
+    try {
+    
+        return {
+            id: task_id = Number(url.split('/').pop().slice(1)),
+            desc: document.querySelector(".b-task-block__description span").textContent.replace("\n", " "). replace(".\n", ". "),
+            tags: tags,
+            category: document.querySelector("[itemprop=serviceType]").textContent.replace("\n", " ").trim(),
+            view: document.querySelector(".b-task-brief__item--status + li").textContent.split(" ").shift(),
+        }
+    } catch (error) {
+        console.log('Не смог распарсить')
+        return {
+            id: '',
+            desc: '',
+            tags: '',
+            view: '',
+            category: '',
+            date_in: '',
+        }
     }
 }
 
 async function getCountPage() {
 
-    const html = await JSDOM.fromURL("https://freelance.habr.com/tasks")
+    const html = await JSDOM.fromURL("https://https://freelance.ru/projects/?spec=4")
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const pages_max = html.window.document.querySelector('.pagination').childNodes[14].textContent
+    const pages_max = html.window.document.querySelector(".pagination.pagination-default").textContent.split(" ")[11]
     
     return Number(pages_max);
 }
@@ -46,43 +49,62 @@ async function getData(numPage = 1) {
 
     let result = []
     
-    const html = await JSDOM.fromURL("https://freelance.habr.com/tasks?page=" + numPage)
+    const html = await JSDOM.fromURL("https://freelance.ru/projects/?spec=4?page=" + numPage)
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const tasksHTML = html.window.document.querySelectorAll(".task");
+    const tasksHTML = html.window.document.querySelectorAll(".proj");
 
-        for (let i = 0; i < tasksHTML.length; i++) {
-            const taskHTML = tasksHTML[i].innerHTML;
-            const task = new JSDOM(taskHTML).window.document
-            const title = task.querySelector(".task__title a").innerHTML;
-            const link = 'https://freelance.habr.com' + task.querySelector(".task__title a").attributes.href.value;
+        for (let i = 0; i < tasksHTML.length; i++) {      
+            const task = tasksHTML[i];  
+            const title = task.querySelector("a.ptitle span").innerHTML;
+            const link = 'https://freelance.ru/projects' + task.querySelector("a.ptitle").attributes.href.value;
         
-            let urgent
-            const urgentHTML = task.querySelector(".task__urgent");
-            if (urgentHTML) { 
-                urgent = urgentHTML.textContent }
-        
-            let safe
-            const safeHTML = task.querySelector(".safe-deal-icon");
-            if (safeHTML) { 
-                safe = safeHTML.title }
+            let link_page = link.split("//").pop()
 
-            const { id, desc, tags, date_in, response, view, user_id, user, finished, in_work, feedback_plus, feedback_minus } = await getItem(link);
+            const { id, desc, category, tags } = await getItem(link);
 
-            let price_value
-            let price_type
-            let price_valuta
-
-            const priceHTML = task.querySelector(".count");
-            if (priceHTML) {
-                const prices = priceHTML.innerHTML.split(/ <span class="suffix">/);
-                price_value = Number.parseInt(prices[0].replace(' ', ''))
-                price_valuta = prices[0].split(" ").pop();
-                price_type = prices[1].replace("проект</span>", "проект").replace("час</span>", "час")
+            let isBusiness = false
+            const isBusiness = task.querySelector(".not_public");
+            if(isBusiness) {
+                isBusiness = true
             }
 
-            result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, finished, in_work, feedback_plus, feedback_minus })
+            let anons = task.querySelectorAll("a.descr span")[1].textContent
+
+            let date_in = task.querySelector(".list-inline li.pdata").attributes.title.value.trim()
+
+            let view = Number(task.querySelector(".views").textContent.split(":").pop())
+            
+            let response = task.querySelector(".messages a i").textContent
+
+            let isContract = false
+            const isContractHTML = task.querySelector(".prepay_contract");
+            if(isContractHTML) {
+                isContract = true
+            }
+
+            let safe = false
+            const safeHTML = task.querySelector(".safe_deal");
+            if (safeHTML) { 
+                safe = true }
+
+            let user_id
+            let user_fio
+            user_id = Number(task.querySelector(".anchor").attributes.id.value.slice(4))
+            user_fio = task.querySelector(".owner img").attributes.alt.value
+
+            let price_value
+            let price_valuta
+
+            const priceHTML = task.querySelector("span.cost a");
+            if (priceHTML) {
+                const prices = priceHTML.innerHTML.trim().split(" ");
+                price_valuta = prices.pop();
+                price_value = Number(prices.slice(0, 2).join().replace(",", ""))
+            }
+
+            result.push({  site: 'freelance.ru', link_page, id, title, tags, isBusiness, anons, isContract, success, safe, price_value, price_valuta, desc, date_in, response, category, view, user_id, user_fio, feedback_plus, feedback_minus })
         
         }
 
@@ -95,11 +117,21 @@ async function main(flag = false, callback) {
         const countPage = await getCountPage();
         for(let i=0; i<countPage; i++) {
             console.log('page #' + (i + 1))
-            const result = (await getData(i+1).catch(e => []));
+            const result = (await getData(i+1).catch(e => {
+                console.error(e);
+                return [];
+            }));
             callback(result)
+            if(i % 5 == 0){
+                await new Promise((resolve) => setTimeout(() => resolve(), 1000 * 30))
+           }
         }
     } else {
-        callback(await getData());
+        try {
+            callback(await getData());
+        } catch (error) {
+            console.error(error);
+        }
     }
     console.log('Done')
 }
