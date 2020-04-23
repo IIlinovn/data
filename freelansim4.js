@@ -5,28 +5,23 @@ const { JSDOM } = jsdom;
 async function getItem(url) {
     const document = (await JSDOM.fromURL(url)).window.document;
 
-    const tags = []
-    const tagsHTML = await document.querySelectorAll("ul.breadcrumb li a");
-    for (let i = 0; i < tagsHTML.length; i++)
-            tags.push(tagsHTML[i].innerHTML)
-
     try {
     
         return {
             id: task_id = Number(url.split('-').pop().split(".").shift()),
-            desc: document.querySelector(".b-task-block__description span").textContent.replace("\n", " "). replace(".\n", ". "),
-            tags: tags,
+            desc: document.querySelector(".txt.href_me").textContent.replace("\n", " "). replace(".\n", ". "),
             user_login: document.querySelector(".avatar a").attributes.href.value.split("/")[2],
-            feedback_plus: Number(document.querySelector(".user_statistics").childNodes[11].textContent.trim().split('\n').pop().split(" / ").shift()),
-            feedback_minus: Number(document.querySelector(".user_statistics").childNodes[11].textContent.trim().split('\n').pop().split(" / ").pop())
+            total: Number(document.querySelector(".bage_projects a").textContent),
+            feedback_plus: Number(document.querySelector(".positive .cnt").textContent),
+            feedback_minus: Number(document.querySelector(".negative .cnt").textContent)
         }
     } catch (error) {
         console.log('Не смог распарсить')
         return {
             id: '',
             desc: '',
-            tags: '',
             user_login: '',
+            total: '',
             feedback_plus: '',
             feedback_minus: ''
         }
@@ -63,12 +58,24 @@ async function getData(numPage = 1) {
         
             let link_page = link.split("//").pop()
 
-            const { id, desc, tags, feedback_plus, feedback_minus } = await getItem(link);
+            const { id, desc, user_login, total, feedback_plus, feedback_minus } = await getItem(link);
 
             let isBusiness = false
-            const isBusiness = task.querySelector(".not_public");
-            if(isBusiness) {
+            const isBusinessHTML = task.querySelector(".not_public");
+            if(isBusinessHTML) {
                 isBusiness = true
+            }
+
+            let timeOut = false
+            const timeOutHTML = task.querySelector("li.proj-inf.status");
+            if (timeOutHTML.textContent == "Истек срок публикации") {
+                timeOut = true
+            }
+            
+            let forAll = true
+            const forAllHTML = task.querySelector(".special_project");
+            if(forAllHTML) {
+                forAll = false
             }
 
             let anons = task.querySelectorAll("a.descr span")[1].textContent
@@ -104,7 +111,7 @@ async function getData(numPage = 1) {
                 price_value = Number(prices.slice(0, 2).join().replace(",", ""))
             }
 
-            result.push({  site: 'freelance.ru', link_page, id, title, tags, category: 'Программирование и ИТ', isBusiness, anons, isContract, success, safe, price_value, price_valuta, desc, date_in, response, view, user_login, user_fio, feedback_plus, feedback_minus })
+            result.push({  site: 'freelance.ru', link_page, id, title, category: 'Программирование и ИТ', isBusiness, forAll, anons, isContract, timeOut, safe, price_value, price_valuta, desc, date_in, response, view, user_login, user_fio, total, feedback_plus, feedback_minus })
         
         }
 

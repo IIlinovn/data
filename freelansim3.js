@@ -9,7 +9,7 @@ async function getItem(url) {
     
         return {
             id: task_id = Number(url.split('/').pop().slice(1)),
-            desc: document.querySelector(".b-task-block__description span").textContent.replace("\n", " "). replace(".\n", ". ").replace("\n\n", " "),
+            desc: document.querySelector(".b-task-block__description span").textContent.replace("\n", " ").replace(".\n", ". ").replace("\n\n", " "),
             date_in: document.querySelector(".b-task-block__info .date-value").textContent,
             category: document.querySelector("[itemprop=serviceType]").textContent.replace("\n", " ").trim(),
             view: document.querySelector(".b-task-brief__item--status + li").textContent.split(" ").shift(),
