@@ -5,6 +5,8 @@ const { JSDOM } = jsdom;
 async function getItem(url) {
     const document = (await JSDOM.fromURL(url)).window.document;
 
+    fs.writeFileSync('detail.html', document.body.outerHTML)
+
     try {
     
         return {
@@ -56,7 +58,7 @@ async function getData(numPage = 1) {
         for (let i = 0; i < tasksHTML.length; i++) {      
             const task = tasksHTML[i];  
             const title = task.querySelector("a.ptitle span").innerHTML;
-            const link = 'https://freelance.ru/projects' + task.querySelector("a.ptitle").attributes.href.value;
+            const link = 'https://freelance.ru/' + task.querySelector("a.ptitle").attributes.href.value;
         
             let link_page = link.split("//").pop()
 
