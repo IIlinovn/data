@@ -56,7 +56,7 @@ async function getData(numPage = 1) {
         for (let i = 0; i < tasksHTML.length; i++) {      
             const task = tasksHTML[i];  
             const title = task.querySelector("a.ptitle span").innerHTML;
-            const link = 'https://freelance.ru/projects' + task.querySelector("a.ptitle").attributes.href.value;
+            const link = 'https://freelance.ru' + task.querySelector(".ptitle").attributes.href.value;
         
             let link_page = link.split("//").pop()
 
@@ -82,11 +82,11 @@ async function getData(numPage = 1) {
 
             let anons = task.querySelectorAll("a.descr span")[1].textContent
 
-            let date_in = task.querySelector(".list-inline li.pdata").attributes.title.value.trim()
+            let date_in = task.querySelector(".list-inline li.pdata").attributes.title.value.trim().split("  ").pop().replace(" ", ", ")
 
             let view = Number(task.querySelector(".views").textContent.split(":").pop())
             
-            let response = task.querySelector(".messages a i").textContent
+            let response = Number(task.querySelector(".messages a i").textContent)
 
             let isContract = false
             const isContractHTML = task.querySelector(".prepay_contract");
