@@ -57,25 +57,24 @@ async function getData(numPage = 1) {
     const html = await JSDOM.fromURL("https://www.fl.ru/projects/?page=" + numPage)
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
-
+    
     const tasksHTML = html.window.document.querySelectorAll(".b-post");
 
         for (let i = 0; i < tasksHTML.length; i++) {
-            const taskHTML = new JSDOM(tasksHTML[i].innerHTML).window.document.body.innerHTML.split(`<script type="text/javascript">document.write('`).map(html => html.split("');")[0]).join('');
-            const task = new JSDOM(taskHTML).window.document
+            const task = tasksHTML[i];
             const title = task.querySelector(".b-post__title  a").innerHTML;
             const link = 'https://www.fl.ru' + task.querySelector(".b-post__title  a").attributes.href.value;
         
             let link_page = link.split("//").pop()
             const { id, tags, desc, price_value, price_valuta, date_in } = await getItem(link);
             
-            let anons = task.querySelector(".b-post__body .b-post__txt").textContent
+            //TODO let anons =  task.querySelector("div.b-post__body div.b-post__txt ").textContent.trim()
 
             let isVacancy = false
             const isVacancyHTML = task.querySelector("span.b-post__bold");
-            if(isVacancyHTML.textContent == "Вакансия") {
-                isVacancy = true
-            }
+            //TODO if(isVacancyHTML.textContent == "Вакансия") {
+                //isVacancy = true
+            //}
 
             let urgent = false
             const urgentHTML = task.querySelector(".b-post__title img")
@@ -88,18 +87,18 @@ async function getData(numPage = 1) {
                 safe = true }
             
             let response
-            //const responseHTML = task.querySelector('.b-post__foot a.b-post__link')
-            //if(responseHTML.textContent === "Нет ответов") {
-           //  response = 0
-           // } else response = Number(responseHTML.textContent.split(" ").shift())
+            const responseHTML = task.querySelector('.b-post__foot a.b-post__link')
+            //TODO if(responseHTML.textContent === "Нет ответов") {
+            // response = 0
+            //} else response = Number(responseHTML.textContent.split(" ").shift())
 
-            let view //= Number(task.querySelector('.b-post__foot span.b-post__txt').textContent.trim())
+            //TODO let view = Number(task.querySelector('.b-post__foot span.b-post__txt').textContent.trim())
             
             let isHidden = false
             const hiddenHTML = task.querySelector('.b-post__foot .b-post__txt .b-post__only')
-            //if(hiddenHTML.textContent != " ") {
-            //    isHidden = true
-           // } 
+            if(hiddenHTML) {
+                isHidden = true
+            } 
             
             let forAll = false
             const forAllHTML = task.querySelector(".b-post__foot .b-post__txt span.b-post__bold i")
@@ -107,7 +106,7 @@ async function getData(numPage = 1) {
                 forAll = true
             }
 
-            result.push({  site: 'fl.ru', link_page, id, isHidden, title, urgent, tags, safe, forAll, anons, price_value, price_valuta, anons, desc, isVacancy, date_in, response, view })
+            result.push({  site: 'fl.ru', link_page, id, isHidden, title, urgent, tags, safe, forAll, /*anons, */price_value, price_valuta, desc, isVacancy, date_in, response, /*view */})
         
         }
 

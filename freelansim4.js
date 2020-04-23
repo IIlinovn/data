@@ -13,11 +13,12 @@ async function getItem(url) {
     try {
     
         return {
-            id: task_id = Number(url.split('/').pop().slice(1)),
+            id: task_id = Number(url.split('-').pop().split(".").shift()),
             desc: document.querySelector(".b-task-block__description span").textContent.replace("\n", " "). replace(".\n", ". "),
             tags: tags,
-            category: document.querySelector("[itemprop=serviceType]").textContent.replace("\n", " ").trim(),
-            view: document.querySelector(".b-task-brief__item--status + li").textContent.split(" ").shift(),
+            user_login: document.querySelector(".avatar a").attributes.href.value.split("/")[2],
+            feedback_plus: Number(document.querySelector(".user_statistics").childNodes[11].textContent.trim().split('\n').pop().split(" / ").shift()),
+            feedback_minus: Number(document.querySelector(".user_statistics").childNodes[11].textContent.trim().split('\n').pop().split(" / ").pop())
         }
     } catch (error) {
         console.log('Не смог распарсить')
@@ -25,9 +26,9 @@ async function getItem(url) {
             id: '',
             desc: '',
             tags: '',
-            view: '',
-            category: '',
-            date_in: '',
+            user_login: '',
+            feedback_plus: '',
+            feedback_minus: ''
         }
     }
 }
@@ -62,7 +63,7 @@ async function getData(numPage = 1) {
         
             let link_page = link.split("//").pop()
 
-            const { id, desc, category, tags } = await getItem(link);
+            const { id, desc, tags, feedback_plus, feedback_minus } = await getItem(link);
 
             let isBusiness = false
             const isBusiness = task.querySelector(".not_public");
@@ -89,9 +90,8 @@ async function getData(numPage = 1) {
             if (safeHTML) { 
                 safe = true }
 
-            let user_id
+           
             let user_fio
-            user_id = Number(task.querySelector(".anchor").attributes.id.value.slice(4))
             user_fio = task.querySelector(".owner img").attributes.alt.value
 
             let price_value
@@ -104,7 +104,7 @@ async function getData(numPage = 1) {
                 price_value = Number(prices.slice(0, 2).join().replace(",", ""))
             }
 
-            result.push({  site: 'freelance.ru', link_page, id, title, tags, isBusiness, anons, isContract, success, safe, price_value, price_valuta, desc, date_in, response, category, view, user_id, user_fio, feedback_plus, feedback_minus })
+            result.push({  site: 'freelance.ru', link_page, id, title, tags, category: 'Программирование и ИТ', isBusiness, anons, isContract, success, safe, price_value, price_valuta, desc, date_in, response, view, user_login, user_fio, feedback_plus, feedback_minus })
         
         }
 
