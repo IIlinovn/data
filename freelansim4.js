@@ -10,6 +10,7 @@ async function getItem(url) {
         return {
             id: task_id = Number(url.split('-').pop().split(".").shift()),
             desc: document.querySelector(".txt.href_me").textContent.replace("\n", " "). replace(".\n", ". "),
+            user_id: Number(document.querySelector(".name .last_act").attributes.id.value.split("_").pop()),
             user_login: document.querySelector(".avatar a").attributes.href.value.split("/")[2],
             total: Number(document.querySelector(".bage_projects a").textContent),
             feedback_plus: Number(document.querySelector(".positive .cnt").textContent),
@@ -20,6 +21,7 @@ async function getItem(url) {
         return {
             id: '',
             desc: '',
+            user_id: '',
             user_login: '',
             total: '',
             feedback_plus: '',
@@ -30,7 +32,7 @@ async function getItem(url) {
 
 async function getCountPage() {
 
-    const html = await JSDOM.fromURL("https://https://freelance.ru/projects/?spec=4")
+    const html = await JSDOM.fromURL("https://freelance.ru/projects/?spec=4")
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
@@ -58,7 +60,7 @@ async function getData(numPage = 1) {
         
             let link_page = link.split("//").pop()
 
-            const { id, desc, user_login, total, feedback_plus, feedback_minus } = await getItem(link);
+            const { id, desc, user_id, user_login, total, feedback_plus, feedback_minus } = await getItem(link);
 
             let isBusiness = false
             const isBusinessHTML = task.querySelector(".not_public");
@@ -111,7 +113,7 @@ async function getData(numPage = 1) {
                 price_value = Number(prices.slice(0, 2).join().replace(",", ""))
             }
 
-            result.push({  site: 'freelance.ru', link_page, id, title, category: 'Программирование и ИТ', isBusiness, forAll, anons, isContract, timeOut, safe, price_value, price_valuta, desc, date_in, response, view, user_login, user_fio, total, feedback_plus, feedback_minus })
+            result.push({  site: 'freelance.ru', link_page, id, title, category: 'Программирование и ИТ', isBusiness, forAll, anons, isContract, timeOut, safe, price_value, price_valuta, desc, date_in, response, view, user_id, user_login, user_fio, total, feedback_plus, feedback_minus })
         
         }
 
