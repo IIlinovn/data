@@ -9,7 +9,7 @@ async function getItem(url) {
     
         return {
             id: task_id = Number(url.split('/').pop().slice(1)),
-            desc: document.querySelector(".b-task-block__description span").textContent.replace("\n", " "). replace(".\n", ". "),
+            desc: document.querySelector(".b-task-block__description span").textContent.replace("\n", " "). replace(".\n", ". ").replace("\n\n", " "),
             date_in: document.querySelector(".b-task-block__info .date-value").textContent,
             category: document.querySelector("[itemprop=serviceType]").textContent.replace("\n", " ").trim(),
             view: document.querySelector(".b-task-brief__item--status + li").textContent.split(" ").shift(),
@@ -55,6 +55,7 @@ async function getData(numPage = 1) {
             const link = 'https://youdo.com' + task.querySelector("a.b-tasks__item__title").attributes.href.value;
         
             let link_page = link.split("//").pop()
+
             const { id, desc, category, date_in, view  } = await getItem(link);
 
             let isVacancy = false
@@ -102,7 +103,7 @@ async function getData(numPage = 1) {
                 } else feedback_minus = 0
             }
 
-            result.push({  site: 'weblancer.net', link_page, id, title, isVacancy, success, safe, price_value, maxprice, price_valuta, desc, date_in, category, view, user_id, user_fio, feedback_plus, feedback_minus })
+            result.push({  site: 'youdo.com', link_page, id, title, isVacancy, success, safe, price_value, maxprice, price_valuta, desc, date_in, category, view, user_id, user_fio, feedback_plus, feedback_minus })
         
         }
 
