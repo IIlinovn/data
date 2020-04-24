@@ -3,6 +3,7 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
 async function getItem(url) {
+    console.log(url)
     const document = (await JSDOM.fromURL(url)).window.document;
 
     fs.writeFileSync('detail.html', document.body.outerHTML)
@@ -10,21 +11,17 @@ async function getItem(url) {
     try {
     
         return {
-            id: task_id = Number(url.split('-').pop().split(".").shift()),
-            desc: document.querySelector(".txt.href_me").textContent.replace("\n", " "). replace(".\n", ". "),
-            user_id: Number(document.querySelector(".name .last_act").attributes.id.value.split("_").pop()),
-            user_login: document.querySelector(".avatar a").attributes.href.value.split("/")[2],
-            total: Number(document.querySelector(".bage_projects a").textContent),
-            feedback_plus: Number(document.querySelector(".positive .cnt").textContent),
-            feedback_minus: Number(document.querySelector(".negative .cnt").textContent)
+            desc: document.querySelector(".td_botttom_line p.txt.href_me").textContent.replace("\n", " "). replace(".\n\n", ". "),
+            user_id: Number(document.querySelector(".bage_projects a").attributes.href.value.split("=").pop()),
+            total: Number(document.querySelector("ul.bage_list li.bage_projects a").textContent),
+            feedback_plus: Number(document.querySelector("li.reviews a p.positive b.cnt").textContent),
+            feedback_minus: Number(document.querySelector("li.reviews a p..negative b.cnt").textContent)
         }
     } catch (error) {
         console.log('Не смог распарсить')
         return {
-            id: '',
             desc: '',
             user_id: '',
-            user_login: '',
             total: '',
             feedback_plus: '',
             feedback_minus: ''
@@ -49,24 +46,28 @@ async function getData(numPage = 1) {
 
     let result = []
     
-    const html = await JSDOM.fromURL("https://freelance.ru/projects/?spec=4?page=" + numPage)
-
+    const html = await JSDOM.fromURL("https://freelance.ru/projects/?spec=4?&page=" + numPage);
+console.log(numPage);
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
     const tasksHTML = html.window.document.querySelectorAll(".proj");
 
         for (let i = 0; i < tasksHTML.length; i++) {      
             const task = tasksHTML[i];  
+
+            const task_id = Number(task.attributes[1].value)
+            let id = task_id
+
             const title = task.querySelector("a.ptitle span").innerHTML;
-            const link = 'https://freelance.ru/' + task.querySelector("a.ptitle").attributes.href.value;
+            const link = 'https://freelance.ru' + task.querySelector("a.ptitle").attributes.href.value;
         
             let link_page = link.split("//").pop()
 
-            const { id, desc, user_id, user_login, total, feedback_plus, feedback_minus } = await getItem(link);
+            const { desc, user_id, total, feedback_plus, feedback_minus } = await getItem(link);
 
             let isBusiness = false
-            const isBusinessHTML = task.querySelector(".not_public");
-            if(isBusinessHTML) {
+            const isBusinessHTML = task.querySelector("li.proj-inf.status");
+            if(isBusinessHTML.textContent == "Для Бизнес-аккаунтов") {
                 isBusiness = true
             }
 
@@ -76,10 +77,10 @@ async function getData(numPage = 1) {
                 timeOut = true
             }
             
-            let forAll = true
-            const forAllHTML = task.querySelector(".special_project");
-            if(forAllHTML) {
-                forAll = false
+            let isSpecial = false
+            const isSpecialHTML = task.querySelector("i.special_project_ico");
+            if(isSpecialHTML) {
+                isSpecial = true
             }
 
             let anons = task.querySelectorAll("a.descr span")[1].textContent
@@ -91,19 +92,20 @@ async function getData(numPage = 1) {
             let response = Number(task.querySelector(".messages a i").textContent)
 
             let isContract = false
-            const isContractHTML = task.querySelector(".prepay_contract");
-            if(isContractHTML) {
+            const isContractHTML = task.querySelector("li.proj-inf.status");
+            if(isContractHTML.textContent == "Заключение договора") {
                 isContract = true
             }
 
             let safe = false
-            const safeHTML = task.querySelector(".safe_deal");
-            if (safeHTML) { 
+            const safeHTML = task.querySelector("li.proj-inf.status");
+            if (safeHTML.textContent == "Безопасная Сделка") { 
                 safe = true }
 
-           
+            let user_login
             let user_fio
             user_fio = task.querySelector(".owner img").attributes.alt.value
+            user_login = task.querySelector(".owner img").attributes[3].value
 
             let price_value
             let price_valuta
@@ -115,7 +117,7 @@ async function getData(numPage = 1) {
                 price_value = Number(prices.slice(0, 2).join().replace(",", ""))
             }
 
-            result.push({  site: 'freelance.ru', link_page, id, title, category: 'Программирование и ИТ', isBusiness, forAll, anons, isContract, timeOut, safe, price_value, price_valuta, desc, date_in, response, view, user_id, user_login, user_fio, total, feedback_plus, feedback_minus })
+            result.push({  site: 'freelance.ru', link_page, id, title, category: 'Программирование и ИТ', isBusiness, isSpecial, anons, isContract, timeOut, safe, price_value, price_valuta, desc, date_in, response, view, user_id, user_login, user_fio, total, feedback_plus, feedback_minus })
         
         }
 
