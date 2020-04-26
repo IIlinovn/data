@@ -31,5 +31,14 @@
             ],
             "program": "${workspaceFolder}\\work.js"
         }
-    ]
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Work mode all",
+            "program": "${workspaceFolder}\\work-all.js",
+            "skipFiles": [
+                "<node_internals>/**"
+            ]
+        },
+   ]
 }
