@@ -61,20 +61,25 @@ async function getData(numPage = 1) {
     const tasksHTML = html.window.document.querySelectorAll(".b-post");
 
         for (let i = 0; i < tasksHTML.length; i++) {
-            const task = tasksHTML[i];
+            fs.writeFileSync('item-in-list.html', tasksHTML[i].innerHTML)
+
+            const html = tasksHTML[i].innerHTML.split(`<script type="text/javascript">document.write('`).map(item => item.replace(`');</script>`, '')).join('')
+            fs.writeFileSync('item-in-list-2.html', html)
+
+            const task = new JSDOM(html).window.document.body;
             const title = task.querySelector(".b-post__title  a").innerHTML;
             const link = 'https://www.fl.ru' + task.querySelector(".b-post__title  a").attributes.href.value;
         
             let link_page = link.split("//").pop()
             const { id, tags, desc, price_value, price_valuta, date_in } = await getItem(link);
             
-            //TODO let anons =  task.querySelector("div.b-post__body div.b-post__txt ").textContent.trim()
+            let anons =  task.querySelector("div.b-post__body div.b-post__txt ").textContent.trim()
 
             let isVacancy = false
             const isVacancyHTML = task.querySelector("span.b-post__bold");
-            //TODO if(isVacancyHTML.textContent == "Вакансия") {
-                //isVacancy = true
-            //}
+            if(isVacancyHTML.textContent == "Вакансия") {
+                isVacancy = true
+            }
 
             let urgent = false
             const urgentHTML = task.querySelector(".b-post__title img")
@@ -88,11 +93,11 @@ async function getData(numPage = 1) {
             
             let response
             const responseHTML = task.querySelector('.b-post__foot a.b-post__link')
-            //TODO if(responseHTML.textContent === "Нет ответов") {
-            // response = 0
-            //} else response = Number(responseHTML.textContent.split(" ").shift())
+            if(responseHTML.textContent === "Нет ответов") {
+             response = 0
+            } else response = Number(responseHTML.textContent.split(" ").shift())
 
-            //TODO let view = Number(task.querySelector('.b-post__foot span.b-post__txt').textContent.trim())
+            let view = Number(task.querySelector('.b-post__foot span.b-post__txt').textContent.trim())
             
             let isHidden = false
             const hiddenHTML = task.querySelector('.b-post__foot .b-post__txt .b-post__only')
@@ -106,7 +111,7 @@ async function getData(numPage = 1) {
                 forAll = true
             }
 
-            result.push({  site: 'fl.ru', link_page, id, isHidden, title, urgent, tags, safe, forAll, /*anons, */price_value, price_valuta, desc, isVacancy, date_in, response, /*view */})
+            result.push({  site: 'fl.ru', link_page, id, anons, isHidden, title, urgent, view, tags, safe, forAll, price_value, price_valuta, desc, isVacancy, date_in, response, view})
         
         }
 
