@@ -97,7 +97,7 @@ console.log(numPage);
 
             let desc, user_id;
 
-            if (!isBusiness && !isContract && !isSpecial)
+            if (!isBusiness && !isContract && !isSpecial && !timeOut)
                 ({ desc, user_id } = await getItem(link));
 
 
