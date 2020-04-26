@@ -46,7 +46,7 @@ async function getData(numPage = 1) {
 
     let result = []
     
-    const html = await JSDOM.fromURL("https://freelance.habr.com/tasks?page=" + numPage)
+    const html = await JSDOM.fromURL("https://freelancehunt.com/projects?page=" + numPage)
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
