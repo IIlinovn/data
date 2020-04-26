@@ -137,12 +137,7 @@ async function getData(numPage = 1) {
 }
 
 async function main(flag = false, callback) {
-
-    getItem('https://www.fl.ru/projects/4377436/razrabotka-planirovochnogo-resheniya.html');
-
-return
-
-    console.log('Start')
+console.log('Start')
     if (flag) {
         const countPage = await getCountPage();
         for(let i=0; i<countPage; i++) {
