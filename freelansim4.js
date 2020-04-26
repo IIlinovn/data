@@ -81,7 +81,7 @@ console.log(numPage);
                 isSpecial = true
             }
 
-            let anons = task.querySelectorAll("a.descr span")[1].textContent
+            let anons = task.querySelectorAll("a.descr span")[1].textContent.replace('\n', ' ')
 
             let date_in = task.querySelector(".list-inline li.pdata").attributes.title.value.trim().split("  ").pop().replace(" ", ", ")
 
