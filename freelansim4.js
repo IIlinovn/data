@@ -146,6 +146,8 @@ async function main(flag = false, callback) {
     } else {
         try {
             callback(await getData());
+            callback(await getData(2));
+            callback(await getData(3));
         } catch (error) {
             console.error(error);
         }
