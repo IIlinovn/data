@@ -15,6 +15,7 @@ async function getItem(url) {
             desc: [...document.querySelectorAll(".txt")].map(item => item.textContent).join(' ').replace("\n", " "). replace(".\n\n", ". "),
             user_id: Number(document.querySelector(".last_act").attributes[0].value.split(/\_/).pop()),
             view: Number(document.querySelector(".viewers div").textContent),
+            category: document.querySelector(".proj_breadcrumb a.active").textContent
             //feedback_plus: Number(document.querySelector("li.reviews a p.positive b.cnt").textContent),
             //feedback_minus: Number(document.querySelector("li.reviews a p.negative b.cnt").textContent)
         }
@@ -30,7 +31,7 @@ async function getItem(url) {
 
 async function getCountPage() {
 
-    const html = await JSDOM.fromURL("https://freelance.ru/projects/?spec=4")
+    const html = await JSDOM.fromURL("https://freelance.ru/projects/")
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
@@ -45,7 +46,7 @@ async function getData(numPage = 1) {
 
     let result = []
     
-    const html = await JSDOM.fromURL("https://freelance.ru/projects/?spec=4?&page=" + numPage);
+    const html = await JSDOM.fromURL("https://freelance.ru/projects/?&page=" + numPage);
 console.log(numPage);
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
@@ -95,10 +96,10 @@ console.log(numPage);
                 isContract = true
             }
 
-            let desc, user_id;
+            let desc, user_id, category;
 
             if (!isBusiness && !isContract && !isSpecial && !timeOut)
-                ({ desc, user_id } = await getItem(link));
+                ({ desc, user_id, category } = await getItem(link));
 
 
             let safe = false
@@ -121,7 +122,7 @@ console.log(numPage);
                 price_value = Number(prices.slice(0, 2).join().replace(",", ""))
             }
 
-            result.push({  site: 'freelance.ru', link_page, id, title, category: 'Программирование и ИТ', isBusiness, isSpecial, anons, isContract, timeOut, safe, price_value, price_valuta, desc, date_in, response, view, user_id, user_login, user_fio })
+            result.push({  site: 'freelance.ru', link_page, id, title, category, isBusiness, isSpecial, anons, isContract, timeOut, safe, price_value, price_valuta, desc, date_in, response, view, user_id, user_login, user_fio })
         
         }
 
