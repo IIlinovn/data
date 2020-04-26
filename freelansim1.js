@@ -5,23 +5,44 @@ const { JSDOM } = jsdom;
 async function getItem(url) {
     const document = (await JSDOM.fromURL(url)).window.document;
 
+    fs.writeFileSync('detail.html', document.body.outerHTML)
+
+    const id = Number(url.split("/")[5].split("-").pop())
+
+    let desc
     try {
-        return {
-            id: Number(url.split("/")[5].split("-").pop()),
-            desc: document.querySelector(".text_field p").textContent.replace("↵", " ").replace("\n", " "),
-            view: Number(document.querySelector(".dot_divided").lastElementChild.textContent.split(' ').shift()),
-            user_fio: document.querySelector(".name a").textContent,
-            date_in: document.querySelector(".time_ago").attributes.title.value.replace(" в", ","),
-        }
+        desc = document.querySelector(".text_field p").textContent.replace("↵", " ").replace("\n", " ");
     } catch (error) {
-        console.log('Не смог распарсить')
-        return {
-            id: '',
-            desc: '',
-            view: '',
-            user_fio: '',
-            date_in: '',
-        }
+        
+    }
+
+    let view
+    try {
+        view = Number(document.querySelector(".dot_divided").lastElementChild.textContent.split(' ').shift());
+    } catch (error) {
+        
+    }
+
+    let user_fio
+    try {
+        user_fio = document.querySelector(".name a").textContent;
+    } catch (error) {
+        
+    }
+
+    let date_in
+    try {
+        date_in = document.querySelector(".time_ago").attributes.title.value.replace(" в", ",");
+    } catch (error) {
+        
+    }
+
+    return {
+        id,
+        desc,
+        view,
+        user_fio,
+        date_in,
     }
 }
 
