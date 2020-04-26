@@ -12,20 +12,18 @@ async function getItem(url) {
     try {
     
         return {
-            desc: document.querySelector(".td_botttom_line p.txt.href_me").textContent.replace("\n", " "). replace(".\n\n", ". "),
-            user_id: Number(document.querySelector(".bage_projects a").attributes.href.value.split("=").pop()),
-            total: Number(document.querySelector("ul.bage_list li.bage_projects a").textContent),
-            feedback_plus: Number(document.querySelector("li.reviews a p.positive b.cnt").textContent),
-            feedback_minus: Number(document.querySelector("li.reviews a p.negative b.cnt").textContent)
+            desc: [...document.querySelectorAll(".txt")].map(item => item.textContent).join(' ').replace("\n", " "). replace(".\n\n", ". "),
+            user_id: Number(document.querySelector(".last_act").attributes[0].value.split(/\_/).pop()),
+            view: Number(document.querySelector(".viewers div").textContent),
+            //feedback_plus: Number(document.querySelector("li.reviews a p.positive b.cnt").textContent),
+            //feedback_minus: Number(document.querySelector("li.reviews a p.negative b.cnt").textContent)
         }
     } catch (error) {
         console.log('Не смог распарсить')
         return {
             desc: '',
             user_id: '',
-            total: '',
-            feedback_plus: '',
-            feedback_minus: ''
+            view: '',
         }
     }
 }
@@ -64,7 +62,6 @@ console.log(numPage);
         
             let link_page = link.split("//").pop()
 
-            const { desc, user_id, total, feedback_plus, feedback_minus } = await getItem(link);
 
             let isBusiness = false
             const isBusinessHTML = task.querySelector("li.proj-inf.status");
@@ -98,6 +95,12 @@ console.log(numPage);
                 isContract = true
             }
 
+            let desc, user_id;
+
+            if (!isBusiness && !isContract && !isSpecial)
+                ({ desc, user_id } = await getItem(link));
+
+
             let safe = false
             const safeHTML = task.querySelector("li.proj-inf.status");
             if (safeHTML.textContent == "Безопасная Сделка") { 
@@ -118,7 +121,7 @@ console.log(numPage);
                 price_value = Number(prices.slice(0, 2).join().replace(",", ""))
             }
 
-            result.push({  site: 'freelance.ru', link_page, id, title, category: 'Программирование и ИТ', isBusiness, isSpecial, anons, isContract, timeOut, safe, price_value, price_valuta, desc, date_in, response, view, user_id, user_login, user_fio, total, feedback_plus, feedback_minus })
+            result.push({  site: 'freelance.ru', link_page, id, title, category: 'Программирование и ИТ', isBusiness, isSpecial, anons, isContract, timeOut, safe, price_value, price_valuta, desc, date_in, response, view, user_id, user_login, user_fio })
         
         }
 
