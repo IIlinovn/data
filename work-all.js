@@ -5,6 +5,7 @@ const freelansim = require("./freelansim");
 const freelansim1 = require("./freelansim1");
 const freelansim2 = require("./freelansim2");
 const freelansim3 = require("./freelansim3");
+const freelansim4 = require("./freelansim4");
 
 const config = require("./config");
 
@@ -24,3 +25,4 @@ freelansim(true, send);
 freelansim1(true, send);
 freelansim2(true, send);
 freelansim3(true, send);
+freelansim4(true, send);
