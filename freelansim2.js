@@ -16,23 +16,32 @@ async function getItem(url) {
         for (let i = 0; i < tagsHTML.length; i++)
             tags.push(tagsHTML[i].innerHTML)
 
-            let price_value = document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent
-            let price_valuta = null;
-            if (price_value == "по договоренности") {
+        let price_value = document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold')
+        let price_valuta = null;
+        if (price_value) {
+            if (price_value.textContent == "по договоренности") {
                 price_value = null;
             } else {
-                price_value = price_value.trim().split(" ").reverse().slice(1).reverse().join().replace(",", "");
+                price_value = price_value.textContent.trim().split(" ").reverse().slice(1).reverse().join().replace(",", "");
                 price_valuta = document.querySelector('td.b-layout__td .b-layout__txt span.b-layout__bold').textContent.trim().split(" ").pop();
             }
-    
-            return {
-                id: task_id,
-                tags: tags,
-                desc: document.querySelector("#project_info_" + task_id + " " + "#projectp" + task_id).textContent.trim(),
-                price_value,
-                price_valuta,
-                date_in: document.querySelectorAll(".b-layout__txt.b-layout__txt_padbot_30 .b-layout__txt.b-layout__txt_fontsize_11")[1].textContent.trim().replace(" |", ",").split("\n").shift().trim().split("     ")[0],
-            }
+        }
+
+        let desc = document.querySelector("#project_info_" + task_id + " " + "#projectp" + task_id);
+        if (desc) desc = desc.textContent.trim()
+
+        let date_in = document.querySelectorAll(".b-layout__txt.b-layout__txt_padbot_30 .b-layout__txt.b-layout__txt_fontsize_11")
+        if (date_in.length) date_in = date_in[1].textContent.trim().replace(" |", ",").split("\n").shift().trim().split("     ")[0]
+
+        return {
+            id: task_id,
+            tags: tags,
+            desc,
+            price_value,
+            price_valuta,
+            date_in,
+        }
+
     } catch (error) {
         console.log('Не смог распарсить')
         return {
@@ -128,6 +137,11 @@ async function getData(numPage = 1) {
 }
 
 async function main(flag = false, callback) {
+
+    getItem('https://www.fl.ru/projects/4377436/razrabotka-planirovochnogo-resheniya.html');
+
+return
+
     console.log('Start')
     if (flag) {
         const countPage = await getCountPage();
