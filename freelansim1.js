@@ -7,7 +7,7 @@ async function getItem(url) {
 
     try {
         return {
-            id: task_id = Number(url.split("/")[5].split("-").pop()),
+            id: Number(url.split("/")[5].split("-").pop()),
             desc: document.querySelector(".text_field p").textContent.replace("↵", " ").replace("\n", " "),
             view: Number(document.querySelector(".dot_divided").lastElementChild.textContent.split(' ').shift()),
             user_fio: document.querySelector(".name a").textContent,
