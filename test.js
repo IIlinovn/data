@@ -2,6 +2,8 @@ const fs = require("fs");
 const axios = require("axios");
 
 const freelansim = require("./freelansim");
+const freelansim2 = require("./freelansim2");
+const freelansim3 = require("./freelansim3");
 
 const config = require("./config-test");
 
@@ -13,8 +15,8 @@ function send(result) {
         console.log('Server response: ' + res.data)
     })
     .catch((err) => {
-        console.error(err)
+        console.error(err.response.data)
     });
 }
 
-freelansim(false, send);
+freelansim3(false, send);
