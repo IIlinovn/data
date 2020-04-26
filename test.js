@@ -2,7 +2,7 @@ const fs = require("fs");
 const axios = require("axios");
 
 const freelansim = require("./freelansim");
-const freelansim1 = require("./freelansim2");
+const freelansim1 = require("./freelansim1");
 const freelansim2 = require("./freelansim2");
 const freelansim3 = require("./freelansim3");
 
@@ -21,6 +21,6 @@ function send(result) {
 }
 
 //freelansim(false, send);
-//freelansim1(false, send);
+freelansim1(false, send);
 //freelansim2(false, send);
 //freelansim3(false, send);

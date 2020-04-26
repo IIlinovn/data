@@ -11,16 +11,18 @@ const config = require("./config");
 function send(result) {
   fs.writeFileSync("result.json", JSON.stringify(result, 2, 2));
   axios
-    .post(config.base_url + '/' + config.group + "/task", result)
-    .then(res => {
-        console.log('Server response: ' + res.data)
+    .post(config.base_url + "/" + config.group + "/task", result)
+    .then((res) => {
+      console.log("Server response: " + res.data);
     })
     .catch((err) => {
-        console.error(err.response.data)
+      console.error(err.response.data);
     });
 }
 
-freelansim(false, send);
-freelansim1(false, send);
-freelansim2(false, send);
-freelansim3(false, send);
+setInterval(() => {
+  freelansim(false, send);
+  freelansim1(false, send);
+  freelansim2(false, send);
+  freelansim3(false, send);
+}, 1000 * 60 * config.interval);
