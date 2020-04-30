@@ -3,39 +3,72 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
 async function getItem(url) {
-    const document = (await JSDOM.fromURL(url)).window.document;
+    //TODO!! не парсит страницы??
+    const document = (await JSD??romURL(url)).window.document;
 
     const tags = []
 
-    const tagsHTML = await document.querySelectorAll(".tags__item_link");
+    const tagsHTML = await docu??.querySelectorAll(".tags .tag.with-tooltip");
 
     for (let i = 0; i < tagsHTML.length; i++)
-        tags.push(tagsHTML[i].innerHTML)
+        {tags.push(tagsHTML[i].innerHTML)}
+    
+    const category = []
 
-    return {
-        id: task_id = Number(url.split('/').pop()),
-        title: document.querySelector(".task__title").textContent,
-        desc: document.querySelector(".task__description").textContent.trim().replace("\n", " ").replace(" \n", " ").replace("\n\n", " "),
-        tags: tags,
-        date_in: document.querySelector(".task__meta").textContent.split('•')[0].trim(),
-        response: Number(document.querySelector(".task__meta").textContent.split('•')[1].trim().split('\n').shift()),
-        view: Number(document.querySelector(".task__meta").textContent.split('•')[2].trim().split('\n').shift()),
-        user_id: document.querySelector(".fullname a").attributes.href.value.split('/')[2],
-        user: document.querySelector(".fullname a").textContent,
-        finished: Number(document.querySelector(".user_statistics").childNodes[5].textContent.trim().split('\n').pop()),
-        in_work: Number(document.querySelector(".user_statistics").childNodes[7].textContent.trim().split('\n').pop()),
-        feedback_plus: Number(document.querySelector(".user_statistics").childNodes[11].textContent.trim().split('\n').pop().split(" / ").shift()),
-        feedback_minus: Number(document.querySelector(".user_statistics").childNodes[11].textContent.trim().split('\n').pop().split(" / ").pop())
+    const categoryHTML = await document.querySelectorAll(".smaller a");
+    
+    for (let i = 0; i < categoryHTML.length; i++)
+        {category.push(categoryHTML[i].innerHTML)}
+    
+    const descs = []
+
+    const descsHTML = await document.querySelectorAll(".well p");
+    
+    for (let i = 0; i < descsHTML.length; i++)
+        {descs.push(descsHTML[i].innerHTML)}
+    
+    try {
+        
+        return {
+            id: task_id = Number(url.split('/').pop()),
+            category: category,
+            desc: descs.join().replace(",", " "),
+            tags: tags,
+            user_id: Number(document.querySelector(".avatar-container .profile-status").attributes[0].textContent),
+            user_fio: document.querySelector("a.profile-name").textContent,
+            user_login: document.querySelector("a.profile-name").attributes.href.value.split('/').pop().split(".").shift(),
+            date_in: document.querySelectorAll(".col-md-3 .row")[1].querySelector(".with-tooltip").attributes[4].value.slice(12).replace(" в", ","),
+            response: Number(document.querySelector("span#bids_count").textContent),
+            view: Number(document.querySelectorAll(".col-md-3 .row")[1].querySelector(".widget div div").textContent.trim().split(' ').shift()),
+            feedback_plus: Number(document.querySelector("span.nowrap span.text-green").textContent),
+            feedback_minus: Number(document.querySelector("span.nowrap span.text-light-gray.with-tooltip").textContent)
+        }
+    } catch (error) {
+        console.log('Не смог распарсить')
+        return {
+            id: '',
+            category: '',
+            desc: '',
+            tags: '',
+            user_id: '',
+            user_fio: '',
+            user_login: '',
+            date_in: '',
+            response: '',
+            view: '',
+            feedback_plus: '',
+            feedback_minus: '',
+        }
     }
 }
 
 async function getCountPage() {
 
-    const html = await JSDOM.fromURL("https://freelance.habr.com/tasks")
+    const html = await JSDOM.fromURL("https://freelancehunt.com/projects")
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
-
-    const pages_max = html.window.document.querySelector('.pagination').childNodes[14].textContent
+   
+    const pages_max = Math.round(Number(html.window.document.querySelector("h1 span").textContent)/15)
     
     return Number(pages_max);
 }
@@ -50,39 +83,72 @@ async function getData(numPage = 1) {
 
     fs.writeFileSync('hh.html', html.window.document.body.outerHTML)
 
-    const tasksHTML = html.window.document.querySelectorAll(".task");
+    const tasksHTML = html.window.document.querySelectorAll(".table.project-list tbody tr");
 
         for (let i = 0; i < tasksHTML.length; i++) {
-            const taskHTML = tasksHTML[i].innerHTML;
-            const task = new JSDOM(taskHTML).window.document
-            const title = task.querySelector(".task__title a").innerHTML;
-            const link = 'https://freelance.habr.com' + task.querySelector(".task__title a").attributes.href.value;
-        
-            let urgent
-            const urgentHTML = task.querySelector(".task__urgent");
-            if (urgentHTML) { 
-                urgent = urgentHTML.textContent }
-        
-            let safe
-            const safeHTML = task.querySelector(".safe-deal-icon");
-            if (safeHTML) { 
-                safe = safeHTML.title }
+            const task = tasksHTML[i];
+            const title = task.querySelector("td.left a").innerHTML;
+            const link = task.querySelector("td.left a").attributes.href.value;
+            
+            let link_page = link.split("//").pop()
+            
+            const { id, desc, tags, category, user_id, user_fio, user_login, date_in, response, view, feedback_plus, feedback_minus } = await getItem(link);
 
-            const { id, desc, tags, date_in, response, view, user_id, user, finished, in_work, feedback_plus, feedback_minus } = await getItem(link);
+            let anons
+            let anonsHTML = task.querySelector("td.left p")
+            if (anonsHTML) {
+                anons = anonsHTML.innerHTML;
+            } else {
+                anons = task.querySelector("td.left div small").textContent
+            }
+            anons = anons.trim().replace("\n", " ")
+        
+            let isHidden = false
+            const isHiddenHTML = task.querySelector("img.with-tooltip");
+            if (isHiddenHTML && isHiddenHTML.attributes.src.value == "/static/images/fugu/lock.png") { 
+                isHidden = true }
+
+            let isBusiness = false
+            const isBusinessHTML = task.querySelector("img.with-tooltip");
+            if (isBusinessHTML && isBusinessHTML.attributes.src.value == "/static/images/freelancehunt/sm/business_safe.svg") { 
+                isBusiness = true }
+
+            let isVacancy = false
+            const isVacancyHTML = task.querySelector("img.with-tooltip");
+            if (isVacancyHTML && isVacancyHTML.attributes.src.value == "/static/images/fugu/calendar-month.png") { 
+                isVacancy = true }
+            
+            let budgetUpper = false
+            const budgetUpperHTML = task.querySelector("img.with-tooltip");
+            if (budgetUpperHTML && budgetUpperHTML.attributes.src.value == "/static/images/fugu/diamond.png") { 
+                budgetUpper = true }
+                
+            let urgent = false
+            const urgentHTML = task.querySelector("img.with-tooltip");
+            if (urgentHTML && urgentHTML.attributes.src.value == "/static/images/fugu/fire-big.png") { 
+                urgent = true }
+
+            let forPlus = false
+            const forPlusHTML = task.querySelector("img.with-tooltip");
+            if (forPlusHTML && forPlusHTML.attributes.src.value == "/static/images/freelancehunt/sm/plus.svg") { 
+                forPlus = true }
+        
+            let isPremium = false
+            const isPremiumHTML = task.querySelector(".label.color-orange.with-tooltip");
+            if (isPremiumHTML) { 
+                isPremium = true }
 
             let price_value
-            let price_type
             let price_valuta
-
-            const priceHTML = task.querySelector(".count");
+            
+            const priceHTML = task.querySelector(".text-green.price");
             if (priceHTML) {
-                const prices = priceHTML.innerHTML.split(/ <span class="suffix">/);
-                price_value = Number.parseInt(prices[0].replace(' ', ''))
-                price_valuta = prices[0].split(" ").pop();
-                price_type = prices[1].replace("проект</span>", "проект").replace("час</span>", "час")
+                const prices = priceHTML.innerHTML.trim().split(" ");
+                price_value = Number.parseInt(prices.shift())
+                price_valuta = priceHTML.querySelector("span").textContent;
             }
 
-            result.push({ id, title, urgent, safe, price_value, price_type, price_valuta, desc, date_in, response, view, tags, user_id, user, finished, in_work, feedback_plus, feedback_minus })
+            result.push({ site: 'freelancehunt.com', link_page, id, title, anons, urgent, category, isHidden, isBusiness, isPremium, budgetUpper, forPlus, isVacancy, price_value, price_valuta, desc, date_in, response, view, tags, user_id, user_login, user_fio, feedback_plus, feedback_minus })
         
         }
 
@@ -95,11 +161,23 @@ async function main(flag = false, callback) {
         const countPage = await getCountPage();
         for(let i=0; i<countPage; i++) {
             console.log('page #' + (i + 1))
-            const result = (await getData(i+1).catch(e => []));
+            const result = (await getData(i+1).catch(e => {
+                console.error(e);
+                return [];
+            }));
             callback(result)
+            if(i % 5 == 0) {
+                await new Promise((resolve) => setTimeout(() => resolve(), 1000 * 30))
+           }
         }
     } else {
-        callback(await getData());
+        try {
+            callback(await getData());
+            callback(await getData(2));
+            callback(await getData(3));
+        } catch (error) {
+            console.error(error);
+        }
     }
     console.log('Done')
 }
