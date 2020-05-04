@@ -4,11 +4,13 @@ const { JSDOM } = jsdom;
 
 async function getItem(url) {
     //TODO!! не парсит страницы??
-    const document = (await JSD??romURL(url)).window.document;
+    const document = (await JSDOM.fromURL(url)).window.document;
+
+    fs.writeFileSync('detail.html', document.body.outerHTML)
 
     const tags = []
 
-    const tagsHTML = await docu??.querySelectorAll(".tags .tag.with-tooltip");
+    const tagsHTML = await document.querySelectorAll(".tags .tag.with-tooltip");
 
     for (let i = 0; i < tagsHTML.length; i++)
         {tags.push(tagsHTML[i].innerHTML)}
@@ -26,22 +28,29 @@ async function getItem(url) {
     
     for (let i = 0; i < descsHTML.length; i++)
         {descs.push(descsHTML[i].innerHTML)}
+
+    const f_plus = document.querySelector('.widget td [data-original-title="Положительные отзывы"]')
+    const f_minus = document.querySelector('.widget td [data-original-title="Отрицательные отзывы"]')
+
+    const hasUser = document.querySelector(".avatar-container .profile-status")
     
     try {
         
         return {
-            id: task_id = Number(url.split('/').pop()),
-            category: category,
-            desc: descs.join().replace(",", " "),
+            id: task_id = Number(url.match(/[\d]{1,10}\./g)[0]),
+            category: category.join(', '),
+            desc: descs.join(' '),
             tags: tags,
-            user_id: Number(document.querySelector(".avatar-container .profile-status").attributes[0].textContent),
-            user_fio: document.querySelector("a.profile-name").textContent,
-            user_login: document.querySelector("a.profile-name").attributes.href.value.split('/').pop().split(".").shift(),
-            date_in: document.querySelectorAll(".col-md-3 .row")[1].querySelector(".with-tooltip").attributes[4].value.slice(12).replace(" в", ","),
+            user_id: hasUser ? Number(document.querySelector(".avatar-container .profile-status").attributes[0].textContent) : '',
+            user_fio: hasUser ? document.querySelector("a.profile-name").textContent : '',
+            user_login: hasUser ? document.querySelector("a.profile-name").attributes.href.value.split('/').pop().split(".").shift() : '',
+            //TODO переписать с использованием поиска тега через атрибуты и обращение к атрибуту title как к свойству
+            //date_in: document.querySelectorAll(".col-md-3 .row")[1].querySelector(".with-tooltip").attributes[4].value.slice(12).replace(" в", ","),
+            date_in: '',
             response: Number(document.querySelector("span#bids_count").textContent),
             view: Number(document.querySelectorAll(".col-md-3 .row")[1].querySelector(".widget div div").textContent.trim().split(' ').shift()),
-            feedback_plus: Number(document.querySelector("span.nowrap span.text-green").textContent),
-            feedback_minus: Number(document.querySelector("span.nowrap span.text-light-gray.with-tooltip").textContent)
+            feedback_plus: f_plus ? Number(f_plus.textContent) : '',
+            feedback_minus: f_minus ? Number(f_minus.textContent) : '',
         }
     } catch (error) {
         console.log('Не смог распарсить')
