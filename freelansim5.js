@@ -36,7 +36,6 @@ async function getItem(url) {
     try {
         
         return {
-            id: task_id = Number(url.match(/[\d]{1,10}\./g)[0]),
             category: category.join(', '),
             desc: descs.join(' '),
             tags: tags,
@@ -52,7 +51,6 @@ async function getItem(url) {
     } catch (error) {
         console.log('Не смог распарсить')
         return {
-            id: '',
             category: '',
             desc: '',
             tags: '',
@@ -98,7 +96,9 @@ async function getData(numPage = 1) {
             
             let link_page = link.split("//").pop()
             
-            const { id, desc, tags, category, user_id, user_fio, user_login, date_in, response, view, feedback_plus, feedback_minus } = await getItem(link);
+            const { desc, tags, category, user_id, user_fio, user_login, date_in, response, view, feedback_plus, feedback_minus } = await getItem(link);
+
+            const id = Number(link.match(/[\d]{1,10}\./g)[0]);
 
             let anons
             let anonsHTML = task.querySelector("td.left p")
@@ -165,7 +165,7 @@ async function main(flag = false, callback) {
     console.log('Start')
     if (flag) {
         const countPage = await getCountPage();
-        for(let i=0; i<countPage; i++) {
+        for(let i=20; i<countPage; i++) {
             console.log('page #' + (i + 1))
             const result = (await getData(i+1).catch(e => {
                 console.error(e);
