@@ -165,7 +165,7 @@ async function main(flag = false, callback) {
     console.log('Start')
     if (flag) {
         const countPage = await getCountPage();
-        for(let i=20; i<countPage; i++) {
+        for(let i=0; i<countPage; i++) {
             console.log('page #' + (i + 1))
             const result = (await getData(i+1).catch(e => {
                 console.error(e);
