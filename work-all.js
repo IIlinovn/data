@@ -22,9 +22,32 @@ function send(result) {
     });
 }
 
-freelansim(true, send);
-freelansim1(true, send);
-freelansim2(true, send);
-freelansim3(true, send);
-freelansim4(true, send);
-freelansim5(true, send);
+switch (Number(process.argv[2])) {
+  case 1:
+    freelansim(true, send);
+    break;
+  case 2:
+    freelansim1(true, send);
+    break;
+  case 3:
+    freelansim2(true, send);
+    break;
+  case 4:
+    freelansim3(true, send);
+    break;
+  case 5:
+    freelansim4(true, send);
+    break;
+  case 6:
+    freelansim5(true, send);
+    break;
+  default:
+    freelansim(true, send);
+    freelansim1(true, send);
+    freelansim2(true, send);
+    freelansim3(true, send);
+    freelansim4(true, send);
+    freelansim5(true, send);
+
+    break;
+}

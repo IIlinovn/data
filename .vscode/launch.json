@@ -30,12 +30,13 @@
                 "<node_internals>/**"
             ],
             "program": "${workspaceFolder}\\work.js"
-        }
+        },
         {
             "type": "node",
             "request": "launch",
             "name": "Work mode all",
             "program": "${workspaceFolder}\\work-all.js",
+            "args": ["6"],
             "skipFiles": [
                 "<node_internals>/**"
             ]
