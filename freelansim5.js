@@ -16,7 +16,7 @@ async function getItem(url) {
     
     const category = []
 
-    const categoryHTML = await document.querySelectorAll(".smaller a");
+    const categoryHTML = await document.querySelectorAll(".col-md-12 .smaller a");
     
     for (let i = 0; i < categoryHTML.length; i++)
         {category.push(categoryHTML[i].innerHTML)}
