@@ -2,7 +2,6 @@ const fs = require("fs");
 const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
-//TODO не парсит данные с открытых страниц!
 async function getItem(url) {
     console.log(url)
     const document = (await JSDOM.fromURL(url)).window.document;
@@ -16,8 +15,6 @@ async function getItem(url) {
             user_id: Number(document.querySelector(".last_act").attributes[0].value.split(/\_/).pop()),
             view: document.querySelector(".viewers div") ? Number(document.querySelector(".viewers div").textContent) : null,
             category: document.querySelector(".proj_breadcrumb a.active").textContent
-            //feedback_plus: Number(document.querySelector("li.reviews a p.positive b.cnt").textContent),
-            //feedback_minus: Number(document.querySelector("li.reviews a p.negative b.cnt").textContent)
         }
     } catch (error) {
         console.log('Не смог распарсить')
@@ -25,6 +22,7 @@ async function getItem(url) {
             desc: '',
             user_id: '',
             view: '',
+            category: ''
         }
     }
 }

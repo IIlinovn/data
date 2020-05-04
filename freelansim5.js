@@ -3,7 +3,6 @@ const jsdom = require("jsdom");
 const { JSDOM } = jsdom;
 
 async function getItem(url) {
-    //TODO!! не парсит страницы??
     const document = (await JSDOM.fromURL(url)).window.document;
 
     fs.writeFileSync('detail.html', document.body.outerHTML)
@@ -44,9 +43,7 @@ async function getItem(url) {
             user_id: hasUser ? Number(document.querySelector(".avatar-container .profile-status").attributes[0].textContent) : '',
             user_fio: hasUser ? document.querySelector("a.profile-name").textContent : '',
             user_login: hasUser ? document.querySelector("a.profile-name").attributes.href.value.split('/').pop().split(".").shift() : '',
-            //TODO переписать с использованием поиска тега через атрибуты и обращение к атрибуту title как к свойству
-            //date_in: document.querySelectorAll(".col-md-3 .row")[1].querySelector(".with-tooltip").attributes[4].value.slice(12).replace(" в", ","),
-            date_in: '',
+            date_in: Number(document.querySelector('[data-freelancehunt-selector="published_date"]').attributes["data-timestamp"].value),
             response: Number(document.querySelector("span#bids_count").textContent),
             view: Number(document.querySelectorAll(".col-md-3 .row")[1].querySelector(".widget div div").textContent.trim().split(' ').shift()),
             feedback_plus: f_plus ? Number(f_plus.textContent) : '',
